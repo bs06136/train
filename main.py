@@ -1,16 +1,34 @@
-# 샘플 Python 스크립트입니다.
 
-# Shift+F10을(를) 눌러 실행하거나 내 코드로 바꿉니다.
-# 클래스, 파일, 도구 창, 액션 및 설정을 어디서나 검색하려면 Shift 두 번을(를) 누릅니다.
+import pymysql
 
+# MySQL 데이터베이스 연결 설정
+conn = pymysql.connect(
+    host='127.0.0.1',  # MySQL 서버 주소
+    user='root',  # MySQL 사용자 이름
+    password='zxc123',  # MySQL 사용자 비밀번호
+    db='new_schema',  # MySQL 데이터베이스 이름
+    charset='utf8mb4'  # 문자 인코딩 설정
+)
 
-def print_hi(name):
-    # 스크립트를 디버그하려면 하단 코드 줄의 중단점을 사용합니다.
-    print(f'Hi, {name}')  # 중단점을 전환하려면 Ctrl+F8을(를) 누릅니다.
+try:
+    # Connection을 통해 Cursor 생성
+    with conn.cursor() as cursor:
+        # SQL 쿼리 실행
+        sql = "SELECT * FROM advisor"  # 사용할 SQL 쿼리
+        cursor.execute(sql)
 
+        # 결과 가져오기
+        result = cursor.fetchall()
+        for row in result:
+            print(row)
 
-# 스크립트를 실행하려면 여백의 녹색 버튼을 누릅니다.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+    # 작업이 성공하면 커밋
+    conn.commit()
 
-# https://www.jetbrains.com/help/pycharm/에서 PyCharm 도움말 참조
+except pymysql.MySQLError as e:
+    print('MySQL Error: ', e)
+    conn.rollback()  # 에러 발생 시 롤백
+
+finally:
+    # 데이터베이스 연결 종료
+    conn.close()
