@@ -47,7 +47,15 @@ CREATE TABLE IF NOT EXISTS Station (
 
 CREATE TABLE IF NOT EXISTS `train`.`Route` (
   `RouteID` INT NOT NULL,
-  PRIMARY KEY (`RouteID`)
+  `StartID` INT NOT NULL,
+  `EndID` INT NOT NULL,
+  PRIMARY KEY (`RouteID`),
+  FOREIGN KEY (`StartID`) REFERENCES `train`.`Station` (`StationID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (`EndID`) REFERENCES `train`.`Station` (`StationID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `train`.`DetailedRoute` (
@@ -58,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `train`.`DetailedRoute` (
   FOREIGN KEY (`StartID`) REFERENCES `train`.`Station` (`StationID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-    FOREIGN KEY (`EndID`) REFERENCES `train`.`Station` (`StationID`)
+  FOREIGN KEY (`EndID`) REFERENCES `train`.`Station` (`StationID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );

@@ -1,4 +1,5 @@
 import mysql.connector
+import itertools
 from datetime import datetime
 
 
@@ -10,9 +11,49 @@ db_connection = mysql.connector.connect(
     database="train"
 )
 
-# 커서 생성
-db_cursor = db_connection.cursor()
 
+# 커서 생성
+def create_all_possible_routes(db_connection):
+    try:
+        db_cursor = db_connection.cursor()
+
+        # 모든 역의 ID 가져오기
+        db_cursor.execute("SELECT StationID FROM Station")
+        all_stations = [station[0] for station in db_cursor.fetchall()]
+
+        # 모든 가능한 경로 생성
+        for start, end in itertools.permutations(all_stations, 2):
+            # Route 테이블에 경로 추가
+            insert_route_query = "INSERT INTO Route (RouteID) VALUES (NULL)"
+            db_cursor.execute(insert_route_query)
+            route_id = db_cursor.lastrowid
+
+            # DetailedRoute 및 Connected_Route에 데이터 추가
+            insert_detailed_route_query = """
+                INSERT INTO DetailedRoute (StartID, EndID) VALUES (%s, %s)
+            """
+            db_cursor.execute(insert_detailed_route_query, (start, end))
+            detailed_route_id = db_cursor.lastrowid
+
+            insert_connected_route_query = """
+                INSERT INTO Connected_Route (RouteID, num, DetaliedRouteID) VALUES (%s, 1, %s)
+            """
+            db_cursor.execute(insert_connected_route_query, (route_id, detailed_route_id))
+
+        db_connection.commit()
+        print("모든 가능한 경로가 성공적으로 저장되었습니다.")
+
+    except mysql.connector.Error as error:
+        print(f"경로 정보 저장 중 오류 발생: {error}")
+        db_connection.rollback()
+
+    finally:
+        if db_cursor:
+            db_cursor.close()
+
+
+create_all_possible_routes(db_connection)
+db_cursor = db_connection.cursor()
 def get_passenger_info():
     try:
         print("승객 정보 입력:")
