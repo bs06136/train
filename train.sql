@@ -83,9 +83,9 @@ CREATE TABLE IF NOT EXISTS `train`.`Timetable` (
 CREATE TABLE IF NOT EXISTS `train`.`Seat` (
   `TrainID` INT NOT NULL,
   `CarriageNum` INT NOT NULL,
-  `SeatNum` INT NOT NULL,
+  `SeatInformation` INT NOT NULL,
   `TimeID` INT NOT NULL,
-  PRIMARY KEY (`TrainID`, `CarriageNum`, `SeatNum`, `TimeID`),
+  PRIMARY KEY (`TrainID`, `CarriageNum`, `TimeID`),
   FOREIGN KEY (`TrainID`) REFERENCES `train`.`Train` (`TrainID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS `train`.`Payment` (
   `PointPaymentID` INT,
   `Refunded` BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (`PaymentID`),
-  FOREIGN KEY (`TrainID`, `CarriageNum`, `SeatNum`, `TimeID`) REFERENCES `train`.`Seat` (`TrainID`, `CarriageNum`, `SeatNum`, `TimeID`)
+  FOREIGN KEY (`TrainID`, `CarriageNum`, `TimeID`) REFERENCES `train`.`Seat` (`TrainID`, `CarriageNum`, `TimeID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   FOREIGN KEY (`PassengerID`) REFERENCES `train`.`Passenger` (`PassengerID`)
