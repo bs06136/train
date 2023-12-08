@@ -19,6 +19,7 @@ drop table IF EXISTS CargoCustomer;
 DROP TABLE IF EXISTS ActualOperation;
 DROP TABLE IF EXISTS LostItems;
 DROP TABLE IF EXISTS AccidentInfo;
+DROP TABLE IF EXISTS ConvenienceFacility
 DROP TABLE IF EXISTS Station;
 DROP TABLE IF EXISTS AttendanceRecord;
 DROP TABLE IF EXISTS CustomerConsultationRecord;
@@ -184,6 +185,21 @@ CREATE TABLE IF NOT EXISTS Station (
     Facilities Text,
     PlatformCount INT
     
+);
+
+CREATE TABLE IF NOT EXISTS ConvenienceFacility (
+   id INT PRIMARY KEY AUTO_INCREMENT,
+    StationID INT,
+    toilet INT,
+    convenienceStore INT,
+    restaurant INT,
+    cafe INT,
+    giftshop INT,
+    ticketStore INT,
+    ParkingArea INT,
+    ATM INT,
+
+    FOREIGN KEY (StationID) REFERENCES Station(StationID)
 );
 
 CREATE TABLE IF NOT EXISTS ActualOperation (

@@ -317,7 +317,13 @@ def main():
         user = login()
 
         while user == "user":
-            print("1. Payment\n2. Refund\n3. Timetable\n4. Seat\n5. Logout")
+            userid = input("사용자 번호를 입력하세요: ")
+            print("1. Payment\n"
+                  "2. Refund\n"
+                  "3. Timetable\n"
+                  "4. Seat\n"
+                  "5. user information"
+                  "0. Logout")
             choice = input("원하는 옵션의 숫자를 입력하세요: ")
 
             if choice == '1':
@@ -329,12 +335,17 @@ def main():
             elif choice == '4':
                 seat()
             elif choice == '5':
+                user_information()
+            elif choice == '0':
                 break
             else:
                 print("잘못된 입력입니다.")
 
         while user == "admin":
-            print("1. Time Table Edit\n2. Promotion Edit\n3. Train Edit\n4. Logout")
+            print("1. Time Table Edit\n"
+                  "2. Promotion Edit\n"
+                  "3. Train Edit\n"
+                  "0. Logout")
             choice = input("원하는 옵션의 숫자를 입력하세요: ")
 
             if choice == '1':
@@ -343,7 +354,7 @@ def main():
                 promotion_edit()
             elif choice == '3':
                 train_edit()
-            elif choice == '4':
+            elif choice == '0':
                 break
             else:
                 print("잘못된 입력입니다.")
