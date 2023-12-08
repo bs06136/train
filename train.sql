@@ -19,7 +19,7 @@ drop table IF EXISTS CargoCustomer;
 DROP TABLE IF EXISTS ActualOperation;
 DROP TABLE IF EXISTS LostItems;
 DROP TABLE IF EXISTS AccidentInfo;
-DROP TABLE IF EXISTS ConvenienceFacility
+DROP TABLE IF EXISTS ConvenienceFacility;
 DROP TABLE IF EXISTS Station;
 DROP TABLE IF EXISTS AttendanceRecord;
 DROP TABLE IF EXISTS CustomerConsultationRecord;
@@ -41,11 +41,20 @@ CREATE TABLE IF NOT EXISTS `train`.`Route` (
 );
 
 CREATE TABLE IF NOT EXISTS `train`.`DetailedRoute` (
-  `RouteID` INT NOT NULL,
-  `RouteNum` INT NOT NULL,
+  `DetaliedRouteID` INT NOT NULL,
   `Start` INT NOT NULL,
   `End` INT NOT NULL,
-  PRIMARY KEY (`RouteID`, `RouteNum`),
+  PRIMARY KEY (`DetaliedRouteID`)
+);
+
+CREATE TABLE IF NOT EXISTS `train`.`Connected_Route` (
+  `RouteID` INT NOT NULL,
+  `num` INT NOT NULL,
+  `DetaliedRouteID` INT NOT NULL,
+  PRIMARY KEY (`RouteID`, `num`,`DetaliedRouteID`),
+  FOREIGN KEY (`DetaliedRouteID`) REFERENCES `train`.`DetailedRoute` (`DetaliedRouteID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   FOREIGN KEY (`RouteID`) REFERENCES `train`.`Route` (`RouteID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE
