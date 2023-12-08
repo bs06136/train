@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `train`.`Route` (
 );
 
 CREATE TABLE IF NOT EXISTS `train`.`DetailedRoute` (
-  `DetaliedRouteID` INT NOT NULL,
+  `DetaliedRouteID` INT NOT NULL AUTO_INCREMENT,
   `StartID` INT NOT NULL,
   `EndID` INT NOT NULL,
   PRIMARY KEY (`DetaliedRouteID`),
@@ -86,13 +86,13 @@ CREATE TABLE IF NOT EXISTS `train`.`Connected_Route` (
 
 CREATE TABLE IF NOT EXISTS `train`.`Fare` (
   `FareID` INT NOT NULL,
-  `ServiceID` INT NOT NULL,
   `Fare` INT NOT NULL,
   PRIMARY KEY (`FareID`)
 );
 
 CREATE TABLE IF NOT EXISTS `train`.`Promotion` (
   `PromotionID` INT NOT NULL,
+  `discount` INT NOT NULL,
   PRIMARY KEY (`PromotionID`)
 );
 
@@ -195,6 +195,7 @@ CREATE TABLE IF NOT EXISTS `train`.`CargoPayment` (
   `CustomerID` INT NOT NULL,
   `CargoID` INT NOT NULL,
   `RouteID` INT NOT NULL,
+  `FareID` INT NOT NULL,
   `PaymentAmount` DECIMAL(10, 2) NOT NULL,
   `PaymentDate` DATE NOT NULL,
   `IsRefunded` BOOLEAN NOT NULL DEFAULT FALSE,
@@ -203,6 +204,9 @@ CREATE TABLE IF NOT EXISTS `train`.`CargoPayment` (
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   FOREIGN KEY (`CargoID`) REFERENCES `train`.`Cargo` (`CargoID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (`FareID`) REFERENCES `train`.`Fare` (`FareID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   FOREIGN KEY (`RouteID`) REFERENCES `train`.`Route` (`RouteID`)
@@ -327,7 +331,7 @@ CREATE TABLE IF NOT EXISTS `train`.`Service_Type` (
   `ServiceID` INT NOT NULL,
   `Service_type` INT NOT NULL,
   `Service_cost` INT NOT NULL,
-  PRIMARY KEY (`ServiceID`, `Service_type`)
+  PRIMARY KEY (`ServiceID`)
 );
 
 CREATE TABLE IF NOT EXISTS `train`.`Service_Payment` (
