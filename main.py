@@ -5,8 +5,8 @@ from datetime import datetime
 # MySQL 연결 설정
 db_connection = mysql.connector.connect(
     host="localhost",
-    user="root",
-    password="@Sgm700121",
+    user="bs06136",
+    password="zxc123",
     database="train"
 )
 
@@ -308,7 +308,53 @@ def complete_refund(payment_id):
         db_connection.rollback()
         print(f"환불중 오류 발생: {e}")
 
+def login():
+    username = input("사용자 이름을 입력하세요: ")
+    return username
 
+def main():
+    while True:
+        user = login()
+
+        while user == "user":
+            print("1. Payment\n2. Refund\n3. Timetable\n4. Seat\n5. Logout")
+            choice = input("원하는 옵션의 숫자를 입력하세요: ")
+
+            if choice == '1':
+                payment()
+            elif choice == '2':
+                refund()
+            elif choice == '3':
+                timetable()
+            elif choice == '4':
+                seat()
+            elif choice == '5':
+                break
+            else:
+                print("잘못된 입력입니다.")
+
+        while user == "admin":
+            print("1. Time Table Edit\n2. Promotion Edit\n3. Train Edit\n4. Logout")
+            choice = input("원하는 옵션의 숫자를 입력하세요: ")
+
+            if choice == '1':
+                time_table_edit()
+            elif choice == '2':
+                promotion_edit()
+            elif choice == '3':
+                train_edit()
+            elif choice == '4':
+                break
+            else:
+                print("잘못된 입력입니다.")
+
+        if user not in ["user", "admin"]:
+            print("잘못된 사용자 이름입니다.")
+
+if __name__ == "__main__":
+    main()
+
+"""
 try:
     passenger_id = int(input("승객 ID 입력: "))
 
@@ -348,3 +394,4 @@ finally:
     # MySQL 연결 종료
     db_cursor.close()
     db_connection.close()
+    """
