@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS Service_Payment;
 drop table IF EXISTS Payment;
 drop table IF EXISTS PointPay;
 drop table IF EXISTS CargoPayment;
+drop table IF EXISTS connected_route;
 drop table IF EXISTS DetailedRoute;
 drop table IF EXISTS Seat;
 drop table IF EXISTS Passenger;
@@ -35,6 +36,15 @@ DROP TABLE IF EXISTS maintenance;
 drop table IF EXISTS Train;
 DROP TABLE IF EXISTS Service_Type;
 
+CREATE TABLE IF NOT EXISTS Station (
+    StationID INT PRIMARY KEY AUTO_INCREMENT,
+    StationName VARCHAR(255) NOT NULL,
+    Location VARCHAR(255) NOT NULL,
+    Facilities Text,
+    PlatformCount INT
+
+);
+
 CREATE TABLE IF NOT EXISTS `train`.`Route` (
   `RouteID` INT NOT NULL,
   PRIMARY KEY (`RouteID`)
@@ -42,9 +52,15 @@ CREATE TABLE IF NOT EXISTS `train`.`Route` (
 
 CREATE TABLE IF NOT EXISTS `train`.`DetailedRoute` (
   `DetaliedRouteID` INT NOT NULL,
-  `Start` INT NOT NULL,
-  `End` INT NOT NULL,
-  PRIMARY KEY (`DetaliedRouteID`)
+  `StartID` INT NOT NULL,
+  `EndID` INT NOT NULL,
+  PRIMARY KEY (`DetaliedRouteID`),
+  FOREIGN KEY (`StartID`) REFERENCES `train`.`Station` (`StationID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+    FOREIGN KEY (`EndID`) REFERENCES `train`.`Station` (`StationID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `train`.`Connected_Route` (
@@ -184,16 +200,6 @@ CREATE TABLE IF NOT EXISTS `train`.`CargoPayment` (
   FOREIGN KEY (`RouteID`) REFERENCES `train`.`Route` (`RouteID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE
-);
-
-
-CREATE TABLE IF NOT EXISTS Station (
-    StationID INT PRIMARY KEY AUTO_INCREMENT,
-    StationName VARCHAR(255) NOT NULL,
-    Location VARCHAR(255) NOT NULL,
-    Facilities Text,
-    PlatformCount INT
-    
 );
 
 CREATE TABLE IF NOT EXISTS ConvenienceFacility (
