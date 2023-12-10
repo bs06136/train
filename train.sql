@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `train`.`Promotion` (
 
 CREATE TABLE IF NOT EXISTS `train`.`Train_compartment` (
   `compartment_type_id` INT NOT NULL,
-  `sear_num` INT NOT NULL,
+  `seat_num` INT NOT NULL,
   PRIMARY KEY (`compartment_type_id`)
 );
 
