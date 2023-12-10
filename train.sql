@@ -436,6 +436,7 @@ CREATE TABLE IF NOT EXISTS `train`.`maintenance_record` (
   PRIMARY KEY (`Feedback_ID`)
   );
 
+/*
 #drop table employees;
 DELIMITER //
 CREATE PROCEDURE InsertStation(IN StationName VARCHAR(255), IN Location VARCHAR(255), IN PlatformCount INT)
@@ -668,3 +669,4 @@ BEGIN
     RETURN TRUE;
 END //
 DELIMITER ;
+*/

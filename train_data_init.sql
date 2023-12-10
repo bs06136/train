@@ -12,6 +12,7 @@ VALUES ('서울역','서울 용산구 한강대로 405',10),
        ('광주역','광주 북구 무등로 235',8);
 
 -- Timetable 테이블에 레코드 추가 (출발역과 도착역 정보 추가)
+/*
 INSERT INTO Timetable (TrainID, DepartureTime, ArrivalTime, OperatingDay, DepartureStationID, ArrivalStationID)
 VALUES
 -- Train 1
@@ -64,6 +65,8 @@ VALUES
 (10, '20:30:00', '23:00:00', '2023-01-01', 8, 9),
 (10, '14:30:00', '17:00:00', '2023-01-02', 8, 9),
 (10, '21:30:00', '00:00:00', '2023-01-02', 8, 9);
+*/
+
 
 INSERT INTO DetailedRoute (StartID, EndID)
 VALUES
