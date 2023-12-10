@@ -11,39 +11,27 @@ VALUES ('서울역','서울 용산구 한강대로 405',10),
        ('신경주역','경북 경주시 건천읍 경주역로 80',4),
        ('광주역','광주 북구 무등로 235',8);
 
--- 승객 정보 추가
-INSERT INTO Passenger (PassengerID) VALUES 
-(1), 
-(2), 
+INSERT INTO Passenger (PassengerID) VALUES
+(1),
+(2),
 (3),
 (4),
 (5);
 
+INSERT INTO Train (TrainID, Num) VALUES
+(1, 101),
+(2, 102),
+(3, 103),
+(4, 104),
+(5, 105);
+
 -- 역차 정보 추가
-INSERT INTO Train_compartment (compartment_type_id, seat_num) VALUES 
-(1, 50), 
-(2, 30), 
-(3, 20),
-(4, 40),
-(5, 25);
-
-INSERT INTO Train (TrainID, Num, Train_compartment_type) VALUES 
-(1, 101, 1), 
-(2, 102, 2), 
-(3, 103, 3),
-(4, 104, 4),
-(5, 105, 5);
-
--- 서비스 정보 추가
-INSERT INTO Service_Type (ServiceID, Service_type, Service_cost) VALUES 
-(1, 1, 5000), 
-(2, 2, 8000), 
-(3, 3, 10000),
-(4, 4, 6000),
-(5, 5, 7500);
-
-
-
+INSERT INTO Train_compartment (TrainID, Num, compartment_type_id, seat_num) VALUES
+(1, 1, 1, 50),
+(2, 1, 1, 30),
+(3, 1, 1, 20),
+(4, 1, 1, 40),
+(5, 1, 1, 25);
 
 INSERT INTO DetailedRoute (StartID, EndID)
 VALUES
@@ -77,6 +65,36 @@ VALUES
 (6, 5); -- 부산역 -> 울산역
 
 
+INSERT INTO Timetable (TrainID, departure_time, arrival_time, operating_day,DetailedRouteID)
+VALUES
+-- Train 1 1 - 10
+	(1, '08:00:00', '10:30:00', '2023-01-01', 3),
+	(1, '14:00:00', '16:30:00', '2023-01-01', 18),
+	(1, '09:00:00', '11:30:00', '2023-01-02', 13),
+	-- Train 2 1 - 7
+	(2, '09:30:00', '12:00:00', '2023-01-01', 1),
+	(2, '16:30:00', '19:00:00', '2023-01-01', 5),
+	(2, '10:30:00', '13:00:00', '2023-01-02', 8),
+	-- Train 3 2 - 5
+	(3, '10:00:00', '12:30:00', '2023-01-01', 4),
+	(3, '17:00:00', '19:30:00', '2023-01-01', 3),
+	(3, '11:00:00', '13:30:00', '2023-01-02', 27),
+	-- Train 4 2 - 6
+	(4, '10:30:00', '13:00:00', '2023-01-01', 4),
+	(4, '17:30:00', '20:00:00', '2023-01-01', 3),
+	(4, '11:30:00', '14:00:00', '2023-01-02', 18),
+	-- Train 5 2 - 10
+	(5, '11:00:00', '13:30:00', '2023-01-01', 5),
+	(5, '18:00:00', '20:30:00', '2023-01-01', 8),
+	(5, '12:00:00', '14:30:00', '2023-01-02', 10);
+
+INSERT INTO Seat (TrainID, CarriageNum, SeatInformation, TimeID) VALUES
+(1, 1, 0, 1),
+(1, 1, 0, 2),
+(1, 1, 0, 3),
+(2, 1, 0, 4),
+(2, 1, 0, 5),
+(2, 1, 0, 6);
 
 INSERT INTO Promotion (PromotionID, discount)
 VALUES
@@ -201,4 +219,3 @@ VALUE (1,4,5,12,10,3,2,2,3),
       (8,1,1,0,1,1,1,1,1),
       (9,2,2,4,5,2,1,1,1),
       (10,2,3,5,6,1,1,1,2);
-

@@ -293,11 +293,86 @@ def make_payment(passenger_id, train_id, carriage_num, seat_num, time_id, route_
 
 
 db_cursor = db_connection.cursor()
-def return_time_table():
-    return 1
 
-def find_zero_positions(num):
-    binary_string = format(num, 'b') # 숫자를 이진 문자열로 변환
+
+def print_timetable(StartID, EndID):
+    #print("1")
+    cursor = db_connection.cursor()
+    #print(StartID, EndID)
+    # 출발역과 도착역을 포함하는 route를 찾기
+    find_route_query = "SELECT * FROM route WHERE StartID = %s AND EndID = %s"
+    cursor.execute(find_route_query, (StartID, EndID))
+    routes = cursor.fetchall()
+
+    temp_time_table = []
+    temp_save_time = []
+
+    #print("2")
+
+    # 루트를 통해 커넥티드루트에서 순서 찾기
+    for route in routes:
+        find_conncected_route_query = "SELECT * FROM connected_route WHERE RouteID = %s"
+        cursor.execute(find_conncected_route_query, (route[0],))
+        connectedroutes = cursor.fetchall()
+        connectedroutes = sorted(connectedroutes, key=lambda x: x[1])  # num이 두 번째 컬럼이므로 key=lambda x: x[1]
+
+        #print("3")
+
+        # connectedroute에 있는 모든 detailedroute를 찾기
+        for connectedroute in connectedroutes:
+            find_detailedroute_query = "SELECT * FROM detailedroute WHERE detailedrouteID = %s"
+            cursor.execute(find_detailedroute_query, (connectedroute[2],))
+            detailedroutes = cursor.fetchall()
+
+            #print("4")
+            # detailedroute와 연관된 시간표 찾기
+            for detailedroute in detailedroutes:
+                detailedrouteID = detailedroute[0]  # 디테일루트ID 받아옴
+                #print(detailedrouteID)
+                find_timetable_query = "SELECT * FROM Timetable WHERE DetailedRouteID = %s"
+                cursor.execute(find_timetable_query, (detailedroute[0],))
+                timetables = cursor.fetchall()
+                #print(timetables)
+                if temp_time_table == []:
+                    #print("if")
+                    for i in range(0, len(timetables)):
+                        #print(timetables[0][1])
+                        temp_time_table.append(timetables[i][1])
+                else:
+                    #print("else")
+                    temp_save_time = []
+                    for i in range(0, len(temp_time_table)):
+                        for j in range(0, len(timetables)):
+                            if temp_time_table[i] == timetables[j][1]:
+                                temp_save_time.append(temp_time_table[i])
+                    temp_time_table = temp_save_time
+    #print("5")
+
+    #for timetable in timetables:
+    #    timetable_list.append(timetable)
+    #print("6")
+    """
+    timetable_id_list = []
+    
+    for timetable in timetable_list:
+        timetableID = timetable[0]  # Assuming the timetable ID is the first column.
+        #  print(f"id는 {timetableID}")
+        #   print("d")
+        timetable_id_list.append(timetableID)
+
+    # print("함수의 끝")
+    """
+    find_timetable_query = "SELECT * FROM Timetable WHERE TrainID = %s"
+    cursor.execute(find_timetable_query, (temp_save_time[0],))
+    timetables = cursor.fetchall()
+    result_time = []
+    for i in range(0 , len(timetables)):
+        result_time.append(timetables[i][0])
+    print(result_time)
+    return result_time
+
+def find_zero_positions(num, length):
+    binary_string = format(num, 'b').zfill(length)  # 숫자를 이진 문자열로 변환하고 지정된 길이로 채움
     zero_positions = []
 
     # 이진 문자열을 뒤집어서 0의 위치를 찾음 (0번 인덱스부터 시작)
@@ -306,71 +381,63 @@ def find_zero_positions(num):
             zero_positions.append(i)
 
     return zero_positions
-def search_seat(time_id, train_id):
-    #train 정보 불러오기
-    query = "SELECT * FROM Train WHERE TrainID = %s"
-    db_cursor.execute(query, (train_id,))
-    searched_train_info = db_cursor.fetchall()
 
-    seat_arr_per_time = {}
-    if not searched_train_info:
-        print("search trin table error")
-
-    #seat의 처음 좌석 정보 불러오기
-    query = "SELECT * FROM seat WHERE TimeID = %s AND TrainID = %s"
-    db_cursor.execute(query, (time_id[0], train_id,))
-    searched_seat_table = db_cursor.fetchall()
-    for i in range(0, searched_train_info[1]):
-        seat_arr_per_time.append(searched_seat_table[2])
-
-    for i in range (len(time_id)):
+    return zero_positions
+def search_seat(time_arr):
+    seat_info = 0
+    train_num = 0
+    for i in range(0 , len(time_arr)):
         #좌석정보 불러오기
-        query = "SELECT * FROM seat WHERE TimeID = %s AND TrainID = %s"
-        db_cursor.execute(query, (time_id[i], train_id,))
+        query = "SELECT * FROM seat WHERE TimeID = %s"
+        db_cursor.execute(query, (time_arr[i],))
         searched_seat_table = db_cursor.fetchall()
-        for j in range (0,searched_train_info[1]):
-            seat_arr_per_time[j] = seat_arr_per_time[j] | searched_seat_table[j][2]
+        seat_info = seat_info | searched_seat_table[0][2]
+        train_num = searched_seat_table[0][0]
 
-    seat_cal_result = {}
-    for i in range (0 , searched_train_info[1]):
-        seat_cal_result.append(find_zero_positions(seat_arr_per_time[i]))
-
-    for i in range (len(seat_cal_result)):
-        bi_result = find_zero_positions(seat_cal_result[i])
-        for j in range (len(bi_result[i])):
-            print(i + " carrier have seat " + bi_result[i])
-
+    bi_result = find_zero_positions(seat_info, 40)
+    print_result = []
+    for i in range(0 , len(bi_result)):
+        print_result.append(bi_result[i] + 1)
     while True:
-        carrier_num = input("객차를 선택해 주세요 : ")
+        #carrier_num = input("객차를 선택해 주세요 : ")
+        print(" carrier have seat ")
+        print(print_result)
         seat_num = input("좌석을 선택해 주세요 : ")
-        bi_result = find_zero_positions(seat_cal_result[i])
-        if not bi_result[seat_num] :
+        try:
+            seat_num = int(seat_num) - 1
+        except ValueError:
+            print("유효하지 않은 입력입니다. 숫자를 입력해주세요.")
+        if not seat_info & seat_num :
             break
-    return carrier_num, seat_num
+    return train_num, seat_num + 1
 
 
 def payment():
     while True:
         start_station = input("출발역을 입력해주세요 : ")
-        query = "SELECT * FROM station WHERE StationName = %s"
+        query = "SELECT * FROM station WHERE StationID = %s"
         db_cursor.execute(query, (start_station,))
         start_id = db_cursor.fetchall()
+        print(start_id[0])
         if start_id:
             break
     while True:
-        end_station = input("출발역을 입력해주세요 : ")
-        query = "SELECT * FROM station WHERE stationname = %s"
-        db_cursor.execute(query, (start_station,))
+        end_station = input("도착역을 입력해주세요 : ")
+        query = "SELECT * FROM station WHERE StationID = %s"
+        db_cursor.execute(query, (end_station,))
         end_id = db_cursor.fetchall()
         if end_id and start_station != end_station:
             break
-    selected_time_id = return_time_table(start_id[0],end_id[0])
-    query = "SELECT * FROM station WHERE StartID = %s EndID = %s"
-    db_cursor.execute(query, (start_id[0],end_id[0]))
+    #print(start_id[0][0], end_id[0][0])
+    selected_time_id = print_timetable(start_id[0][0],end_id[0][0])
+
+    query = "SELECT * FROM Route WHERE StartID = %s AND EndID = %s"
+    db_cursor.execute(query, (start_id[0][0],end_id[0][0],))
     route_id = db_cursor.fetchall()
     if not route_id:
         print ("route find error")
-    seat_select = search_seat(selected_time_id[0], selected_time_id[1])
+    seat_select = search_seat(selected_time_id)
+    print("train " + str(seat_select[0]) + " seat" + str(seat_select[1]))
 
 
 

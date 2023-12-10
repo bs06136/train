@@ -37,6 +37,30 @@ finally:
     # 연결 닫기
     print("MySQL table created")
 
+try:
+    # SQL 파일 열기
+    with open('train_data_init.sql', 'r', encoding='utf-8') as file:
+        sql_script = file.read()
+
+    # SQL 명령어를 ';' 기준으로 분리
+    sql_commands = sql_script.split(';')
+
+    # 커서 생성
+    cursor = db_connection.cursor()
+
+    # 각 SQL 명령어 실행
+    for command in sql_commands:
+        if command.strip() != '':
+            cursor.execute(command)
+
+    # 변경 사항 저장
+    db_connection.commit()
+
+except mysql.connector.Error as error:
+    print("Failed to execute script: {}".format(error))
+
+finally:
+    print("MySQL data inserted")
 
 def create_graph(db_cursor):
     graph = {}
@@ -115,32 +139,4 @@ def create_routes_and_connections(db_connection):
             db_cursor.close()
 
 create_routes_and_connections(db_connection)
-
-try:
-    # SQL 파일 열기
-    with open('train_data_init.sql', 'r', encoding='utf-8') as file:
-        sql_script = file.read()
-
-    # SQL 명령어를 ';' 기준으로 분리
-    sql_commands = sql_script.split(';')
-
-    # 커서 생성
-    cursor = db_connection.cursor()
-
-    # 각 SQL 명령어 실행
-    for command in sql_commands:
-        if command.strip() != '':
-            cursor.execute(command)
-
-    # 변경 사항 저장
-    db_connection.commit()
-
-except mysql.connector.Error as error:
-    print("Failed to execute script: {}".format(error))
-
-finally:
-    # 연결 닫기
-    if (db_connection.is_connected()):
-        cursor.close()
-        db_connection.close()
-        print("MySQL connection is closed")
+db_connection.close()

@@ -31,8 +31,8 @@ DROP TABLE IF EXISTS vending_payment;
 DROP TABLE IF EXISTS vending_machine;
 DROP TABLE IF EXISTS maintenance_record;
 DROP TABLE IF EXISTS maintenance;
-drop table IF EXISTS Train;
 DROP TABLE IF EXISTS Train_compartment;
+drop table IF EXISTS Train;
 DROP TABLE IF EXISTS Service_Type;
 
 
@@ -96,24 +96,25 @@ CREATE TABLE IF NOT EXISTS `train`.`Promotion` (
   PRIMARY KEY (`PromotionID`)
 );
 
-CREATE TABLE IF NOT EXISTS `train`.`Train_compartment` (
-  `compartment_type_id` INT NOT NULL,
-  `seat_num` INT NOT NULL,
-  PRIMARY KEY (`compartment_type_id`)
-);
-
 CREATE TABLE IF NOT EXISTS `train`.`Train` (
   `TrainID` INT NOT NULL,
   `Num` INT NOT NULL,
-  `Train_compartment_type` INT NOT NULL,
-  PRIMARY KEY (`TrainID`),
-  FOREIGN KEY (Train_compartment_type) REFERENCES `train`.`Train_compartment`(`compartment_type_id`)
+  PRIMARY KEY (`TrainID`)
+);
+
+CREATE TABLE IF NOT EXISTS `train`.`Train_compartment` (
+  `TrainID` INT NOT NULL,
+  `Num` INT NOT NULL,
+  `compartment_type_id` INT NOT NULL,
+  `seat_num` INT NOT NULL,
+  PRIMARY KEY (`TrainID`, `Num`),
+  FOREIGN KEY (TrainID) REFERENCES `train`.`Train`(`TrainID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `train`.`Timetable` (
-  `TimeID` INT NOT NULL,
+  `TimeID` INT NOT NULL AUTO_INCREMENT,
   TrainID INT,
   departure_time TIME,
   arrival_time TIME,
