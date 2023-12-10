@@ -11,6 +11,37 @@ VALUES ('서울역','서울 용산구 한강대로 405',10),
        ('신경주역','경북 경주시 건천읍 경주역로 80',4),
        ('광주역','광주 북구 무등로 235',8);
 
+-- 승객 정보 추가
+INSERT INTO Passenger (PassengerID) VALUES 
+(1), 
+(2), 
+(3),
+(4),
+(5);
+
+-- 역차 정보 추가
+INSERT INTO Train_compartment (compartment_type_id, seat_num) VALUES 
+(1, 50), 
+(2, 30), 
+(3, 20),
+(4, 40),
+(5, 25);
+
+INSERT INTO Train (TrainID, Num, Train_compartment_type) VALUES 
+(1, 101, 1), 
+(2, 102, 2), 
+(3, 103, 3),
+(4, 104, 4),
+(5, 105, 5);
+
+-- 서비스 정보 추가
+INSERT INTO Service_Type (ServiceID, Service_type, Service_cost) VALUES 
+(1, 1, 5000), 
+(2, 2, 8000), 
+(3, 3, 10000),
+(4, 4, 6000),
+(5, 5, 7500);
+
 -- Timetable 테이블에 레코드 추가 (출발역과 도착역 정보 추가)
 INSERT INTO Timetable (TrainID, DepartureTime, ArrivalTime, OperatingDay, DepartureStationID, ArrivalStationID)
 VALUES
