@@ -13,7 +13,7 @@ db_connection = mysql.connector.connect(
 
 try:
     # SQL 파일 열기
-    with open('train.sql', 'r') as file:
+    with open('train_table_init.sql', 'r', encoding='utf-8') as file:
         sql_script = file.read()
 
     # SQL 명령어를 ';' 기준으로 분리
@@ -35,10 +35,7 @@ except mysql.connector.Error as error:
 
 finally:
     # 연결 닫기
-    if (db_connection.is_connected()):
-        cursor.close()
-        db_connection.close()
-        print("MySQL connection is closed")
+    print("MySQL table created")
 
 
 def create_graph(db_cursor):
@@ -121,7 +118,7 @@ create_routes_and_connections(db_connection)
 
 try:
     # SQL 파일 열기
-    with open('train_data_init.sql.sql', 'r') as file:
+    with open('train_data_init.sql', 'r', encoding='utf-8') as file:
         sql_script = file.read()
 
     # SQL 명령어를 ';' 기준으로 분리
