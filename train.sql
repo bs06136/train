@@ -436,8 +436,6 @@ CREATE TABLE IF NOT EXISTS `train`.`maintenance_record` (
   );
 
 #drop table employees;
-'
--- Station 테이블에 데이터 삽입
 DELIMITER //
 CREATE PROCEDURE InsertStation(IN StationName VARCHAR(255), IN Location VARCHAR(255), IN PlatformCount INT)
 BEGIN
@@ -532,6 +530,70 @@ BEGIN
 END //
 DELIMITER ;
 
+-- 화물 예약 및 처리 함수
+DELIMITER //
+CREATE FUNCTION ReserveAndProcessCargoBulk(cargoDataList TEXT)
+RETURNS INT
+NO SQL
+BEGIN
+    DECLARE cargoID INT;
+    DECLARE routeID INT;
+    DECLARE fareID INT;
+    DECLARE paymentAmount DECIMAL(10, 2);
+
+    -- 임시 테이블 생성
+    CREATE TEMPORARY TABLE IF NOT EXISTS TempCargoData (
+        CargoType INT,
+        CargoWeight INT
+    );
+
+    -- 콤마(,)를 기준으로 문자열을 분리하여 TempCargoData 테이블에 삽입
+    INSERT INTO TempCargoData (CargoType, CargoWeight)
+    SELECT CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(cargoDataList, ',', n.digit+1), ',', -1) AS UNSIGNED) AS CargoType,
+           CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(cargoDataList, ',', n.digit+1), ',', -1) AS UNSIGNED) AS CargoWeight
+    FROM generator_1_to_1000 n
+    WHERE n.digit < LENGTH(cargoDataList) - LENGTH(REPLACE(cargoDataList, ',', '')) + 1;
+
+    -- 화물 정보 삽입
+    INSERT INTO Cargo (CargoType, CargoWeight)
+    SELECT CargoType, CargoWeight FROM TempCargoData;
+
+    -- 새로 추가된 화물 정보의 ID 가져오기
+    SELECT LAST_INSERT_ID() INTO cargoID;
+
+    -- 화물 운송 노선 정보 삽입 (가정: 노선은 고정 값)
+    INSERT INTO Route (StartID, EndID) VALUES (1, 2);
+
+    -- 새로 추가된 노선 정보의 ID 가져오기
+    SELECT LAST_INSERT_ID() INTO routeID;
+
+    -- 화물 요금 정보 삽입 (가정: 요금은 고정 값)
+    INSERT INTO Fare (Fare) VALUES (100);
+
+    -- 새로 추가된 요금 정보의 ID 가져오기
+    SELECT LAST_INSERT_ID() INTO fareID;
+
+    -- 화물 운송 비용 계산
+    SET paymentAmount = (SELECT SUM(CargoWeight * CargoType) FROM TempCargoData);
+
+    -- 화물 결제 정보를 CargoPayment 테이블에 추가
+    INSERT INTO CargoPayment (CargoID, RouteID, FareID, PaymentAmount, PaymentDate)
+    VALUES (cargoID, routeID, fareID, paymentAmount, CURRENT_DATE);
+
+    -- 화물 결제 정보를 Payment 테이블에 추가
+    INSERT INTO Payment (CargoID, RouteID, FareID, PaymentAmount, PaymentDate)
+    VALUES (cargoID, routeID, fareID, paymentAmount, CURRENT_DATE);
+
+    -- 임시 테이블 삭제
+    DROP TEMPORARY TABLE IF EXISTS TempCargoData;
+
+    -- 예약한 화물 정보의 ID 반환
+    RETURN cargoID;
+END //
+DELIMITER ;
+
+
+
 -- 새로운 물품 분실 정보 삽입 시 처리
 DELIMITER //
 CREATE PROCEDURE HandleLostItem(IN ownerName VARCHAR(255), IN itemInfo TEXT, IN dateInfo DATE, IN foundLocation INT, IN processingStatus VARCHAR(50))
@@ -543,10 +605,8 @@ END //
 DELIMITER ;
 
 --  새로운 사고 정보 삽입 시 처리
-DELIMITER //
 CREATE PROCEDURE HandleAccident(IN stationID INT, IN accidentTime DATETIME, IN weather VARCHAR(255), 
     IN accidentType VARCHAR(255), IN injuredCount INT, IN actionTaken TEXT)
-BEGIN
     -- 사고 정보 삽입
     INSERT INTO AccidentInfo (StationID, AccidentTime, Weather, AccidentType, InjuredCount, ActionTaken)
     VALUES (stationID, accidentTime, weather, accidentType, injuredCount, actionTaken);
@@ -575,4 +635,35 @@ BEGIN
 END //
 DELIMITER ;
 
-'
+-- 환불 정보를 기록하는 프로시저
+DELIMITER //
+CREATE PROCEDURE RecordRefund(IN paymentID INT)
+BEGIN
+    -- 환불 정보를 Refund 테이블에 추가
+    INSERT INTO Refund (PaymentID) VALUES (paymentID);
+END //
+DELIMITER ;
+
+-- 결제 정보를 업데이트하여 환불 여부를 나타내는 프로시저
+DELIMITER //
+CREATE PROCEDURE UpdatePaymentForRefund(IN paymentID INT)
+BEGIN
+    -- 결제 정보를 업데이트하여 환불 여부를 나타냄
+    UPDATE Payment SET Refunded = TRUE WHERE PaymentID = paymentID;
+END //
+DELIMITER ;
+
+-- 환불 처리 함수
+DELIMITER //
+CREATE FUNCTION ProcessRefund(paymentID INT) RETURNS BOOLEAN DETERMINISTIC
+BEGIN
+    -- 결제 정보 업데이트
+    CALL UpdatePaymentForRefund(paymentID);
+    
+    -- 환불 정보 기록
+    CALL RecordRefund(paymentID);
+
+    -- 성공적으로 환불 처리되었음을 반환
+    RETURN TRUE;
+END //
+DELIMITER ;
