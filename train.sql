@@ -34,6 +34,7 @@ DROP TABLE IF EXISTS vending_machine;
 DROP TABLE IF EXISTS maintenance_record;
 DROP TABLE IF EXISTS maintenance;
 drop table IF EXISTS Train;
+DROP TABLE IF EXISTS Train_compartment;
 DROP TABLE IF EXISTS Service_Type;
 
 CREATE TABLE IF NOT EXISTS Station (
@@ -59,10 +60,10 @@ CREATE TABLE IF NOT EXISTS `train`.`Route` (
 );
 
 CREATE TABLE IF NOT EXISTS `train`.`DetailedRoute` (
-  `DetaliedRouteID` INT NOT NULL AUTO_INCREMENT,
+  `DetailedRouteID` INT NOT NULL AUTO_INCREMENT,
   `StartID` INT NOT NULL,
   `EndID` INT NOT NULL,
-  PRIMARY KEY (`DetaliedRouteID`),
+  PRIMARY KEY (`DetailedRouteID`),
   FOREIGN KEY (`StartID`) REFERENCES `train`.`Station` (`StationID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
@@ -74,9 +75,9 @@ CREATE TABLE IF NOT EXISTS `train`.`DetailedRoute` (
 CREATE TABLE IF NOT EXISTS `train`.`Connected_Route` (
   `RouteID` INT NOT NULL,
   `num` INT NOT NULL,
-  `DetaliedRouteID` INT NOT NULL,
-  PRIMARY KEY (`RouteID`, `num`,`DetaliedRouteID`),
-  FOREIGN KEY (`DetaliedRouteID`) REFERENCES `train`.`DetailedRoute` (`DetaliedRouteID`)
+  `DetailedRouteID` INT NOT NULL,
+  PRIMARY KEY (`RouteID`, `num`,`DetailedRouteID`),
+  FOREIGN KEY (`DetailedRouteID`) REFERENCES `train`.`DetailedRoute` (`DetailedRouteID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   FOREIGN KEY (`RouteID`) REFERENCES `train`.`Route` (`RouteID`)
@@ -96,19 +97,34 @@ CREATE TABLE IF NOT EXISTS `train`.`Promotion` (
   PRIMARY KEY (`PromotionID`)
 );
 
+CREATE TABLE IF NOT EXISTS `train`.`Train_compartment` (
+  `compartment_type_id` INT NOT NULL,
+  `sear_num` INT NOT NULL,
+  PRIMARY KEY (`compartment_type_id`)
+);
+
 CREATE TABLE IF NOT EXISTS `train`.`Train` (
   `TrainID` INT NOT NULL,
-  PRIMARY KEY (`TrainID`)
+  `Num` INT NOT NULL,
+  `Train_compartment_type` INT NOT NULL,
+  PRIMARY KEY (`TrainID`),
+  FOREIGN KEY (Train_compartment_type) REFERENCES `train`.`Train_compartment`(`compartment_type_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `train`.`Timetable` (
   `TimeID` INT NOT NULL,
-  train_id INT,
+  TrainID INT,
   departure_time TIME,
   arrival_time TIME,
   operating_day DATE,
+  DetailedRouteID INT,
   PRIMARY KEY (`TimeID`),
-  FOREIGN KEY (train_id) REFERENCES `train`.`Train`(`TrainID`)
+  FOREIGN KEY (TrainID) REFERENCES `train`.`Train`(`TrainID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (DetailedRouteID) REFERENCES `train`.`DetailedRoute`(`DetailedRouteID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
