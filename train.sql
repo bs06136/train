@@ -59,10 +59,10 @@ CREATE TABLE IF NOT EXISTS `train`.`Route` (
 );
 
 CREATE TABLE IF NOT EXISTS `train`.`DetailedRoute` (
-  `DetaliedRouteID` INT NOT NULL AUTO_INCREMENT,
+  `DetailedRouteID` INT NOT NULL AUTO_INCREMENT,
   `StartID` INT NOT NULL,
   `EndID` INT NOT NULL,
-  PRIMARY KEY (`DetaliedRouteID`),
+  PRIMARY KEY (`DetailedRouteID`),
   FOREIGN KEY (`StartID`) REFERENCES `train`.`Station` (`StationID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
@@ -74,9 +74,9 @@ CREATE TABLE IF NOT EXISTS `train`.`DetailedRoute` (
 CREATE TABLE IF NOT EXISTS `train`.`Connected_Route` (
   `RouteID` INT NOT NULL,
   `num` INT NOT NULL,
-  `DetaliedRouteID` INT NOT NULL,
-  PRIMARY KEY (`RouteID`, `num`,`DetaliedRouteID`),
-  FOREIGN KEY (`DetaliedRouteID`) REFERENCES `train`.`DetailedRoute` (`DetaliedRouteID`)
+  `DetailedRouteID` INT NOT NULL,
+  PRIMARY KEY (`RouteID`, `num`,`DetailedRouteID`),
+  FOREIGN KEY (`DetailedRouteID`) REFERENCES `train`.`DetailedRoute` (`DetailedRouteID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   FOREIGN KEY (`RouteID`) REFERENCES `train`.`Route` (`RouteID`)
@@ -438,12 +438,12 @@ BEGIN
     DECLARE StartStation INT;
     DECLARE EndStation INT;
     
-    SELECT StartID, EndID INTO StartStation, EndStation FROM DetailedRoute WHERE DetaliedRouteID = NEW.DetaliedRouteID;
+    SELECT StartID, EndID INTO StartStation, EndStation FROM DetailedRoute WHERE DetailedRouteID = NEW.DetailedRouteID;
     
-    INSERT INTO Connected_Route(RouteID, num, DetaliedRouteID)
-    VALUES (NEW.DetaliedRouteID, 1, NEW.DetaliedRouteID),
-           (NEW.DetaliedRouteID, 2, StartStation),
-           (NEW.DetaliedRouteID, 3, EndStation);
+    INSERT INTO Connected_Route(RouteID, num, DetailedRouteID)
+    VALUES (NEW.DetailedRouteID, 1, NEW.DetailedRouteID),
+           (NEW.DetailedRouteID, 2, StartStation),
+           (NEW.DetailedRouteID, 3, EndStation);
 END //
 DELIMITER ;
 
@@ -529,7 +529,6 @@ DELIMITER ;
 --  새로운 사고 정보 삽입 시 처리
 CREATE PROCEDURE HandleAccident(IN stationID INT, IN accidentTime DATETIME, IN weather VARCHAR(255), 
     IN accidentType VARCHAR(255), IN injuredCount INT, IN actionTaken TEXT)
-BEGIN
     -- 사고 정보 삽입
     INSERT INTO AccidentInfo (StationID, AccidentTime, Weather, AccidentType, InjuredCount, ActionTaken)
     VALUES (stationID, accidentTime, weather, accidentType, injuredCount, actionTaken);
@@ -537,7 +536,7 @@ END //
 DELIMITER ;
 
 -- LostItems 테이블에 새로운 데이터가 삽입될 때 처리
-DELIMITER //`
+DELIMITER //
 CREATE TRIGGER AfterInsertLostItem
 AFTER INSERT ON LostItems
 FOR EACH ROW
