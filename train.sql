@@ -420,7 +420,7 @@ CREATE TABLE IF NOT EXISTS `train`.`maintenance_record` (
   );
 
 #drop table employees;
-
+'
 -- Station 테이블에 데이터 삽입
 DELIMITER //
 CREATE PROCEDURE InsertStation(IN StationName VARCHAR(255), IN Location VARCHAR(255), IN PlatformCount INT)
@@ -438,12 +438,12 @@ BEGIN
     DECLARE StartStation INT;
     DECLARE EndStation INT;
     
-    SELECT StartID, EndID INTO StartStation, EndStation FROM DetailedRoute WHERE DetaliedRouteID = NEW.DetaliedRouteID;
+    SELECT StartID, EndID INTO StartStation, EndStation FROM DetailedRoute WHERE DetailedRouteID = NEW.DetailedRouteID;
     
-    INSERT INTO Connected_Route(RouteID, num, DetaliedRouteID)
-    VALUES (NEW.DetaliedRouteID, 1, NEW.DetaliedRouteID),
-           (NEW.DetaliedRouteID, 2, StartStation),
-           (NEW.DetaliedRouteID, 3, EndStation);
+    INSERT INTO Connected_Route(RouteID, num, DetailedRouteID)
+    VALUES (NEW.DetailedRouteID, 1, NEW.DetailedRouteID),
+           (NEW.DetailedRouteID, 2, StartStation),
+           (NEW.DetailedRouteID, 3, EndStation);
 END //
 DELIMITER ;
 
@@ -527,6 +527,7 @@ END //
 DELIMITER ;
 
 --  새로운 사고 정보 삽입 시 처리
+DELIMITER //
 CREATE PROCEDURE HandleAccident(IN stationID INT, IN accidentTime DATETIME, IN weather VARCHAR(255), 
     IN accidentType VARCHAR(255), IN injuredCount INT, IN actionTaken TEXT)
 BEGIN
@@ -537,7 +538,7 @@ END //
 DELIMITER ;
 
 -- LostItems 테이블에 새로운 데이터가 삽입될 때 처리
-DELIMITER //`
+DELIMITER //
 CREATE TRIGGER AfterInsertLostItem
 AFTER INSERT ON LostItems
 FOR EACH ROW
@@ -558,3 +559,4 @@ BEGIN
 END //
 DELIMITER ;
 
+'
