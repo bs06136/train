@@ -12,83 +12,6 @@ db_connection = mysql.connector.connect(
     database="train"
 )
 
-def create_graph(db_cursor):
-    graph = {}
-    db_cursor.execute("SELECT StartID, EndID FROM DetailedRoute")
-    for start_id, end_id in db_cursor:
-        graph.setdefault(start_id, []).append(end_id)
-        graph.setdefault(end_id, []).append(start_id)
-    return graph
-
-def find_shortest_path(graph, start, end):
-    queue = [(0, start, [])]
-    visited = set()
-    while queue:
-        (cost, node, path) = heapq.heappop(queue)
-        if node not in visited:
-            visited.add(node)
-            path = path + [node]
-
-            if node == end:
-                return path
-
-            for next_node in graph.get(node, []):
-                if next_node not in visited:
-                    heapq.heappush(queue, (cost + 1, next_node, path))
-    return []
-
-def create_routes_and_connections(db_connection):
-    try:
-        db_cursor = db_connection.cursor(buffered=True)
-
-        # 그래프 생성
-        graph = create_graph(db_cursor)
-
-        # 모든 역의 ID 가져오기
-        db_cursor.execute("SELECT StationID FROM Station ORDER BY StationID")
-        all_stations = [station[0] for station in db_cursor]
-
-        # 모든 가능한 Route 및 Connected_Route 생성
-        for start_id, end_id in itertools.permutations(all_stations, 2):
-            shortest_path = find_shortest_path(graph, start_id, end_id)
-            if shortest_path:
-                route_id = int(f"{start_id:02d}{end_id:02d}")
-
-                # Route 테이블에 경로 추가
-                insert_route_query = "INSERT IGNORE INTO Route (RouteID, StartID, EndID) VALUES (%s, %s, %s)"
-                db_cursor.execute(insert_route_query, (route_id, start_id, end_id))
-
-                # Connected_Route에 상세 경로 추가
-                for num, node in enumerate(shortest_path[:-1], start=1):
-                    detailed_route_id_query = """
-                        SELECT DetaliedRouteID FROM DetailedRoute
-                        WHERE StartID = %s AND EndID = %s
-                    """
-                    db_cursor.execute(detailed_route_id_query, (node, shortest_path[num]))
-                    result = db_cursor.fetchone()
-                    if result:
-                        detailed_route_id = result[0]
-
-                        insert_connected_route_query = """
-                            INSERT INTO Connected_Route (RouteID, num, DetaliedRouteID)
-                            VALUES (%s, %s, %s)
-                        """
-                        db_cursor.execute(insert_connected_route_query, (route_id, num, detailed_route_id))
-                    else:
-                        print(f"No detailed route found for StartID {node} and EndID {shortest_path[num]}")
-
-        db_connection.commit()
-        print("모든 최단 경로가 성공적으로 생성되었습니다.")
-
-    except mysql.connector.Error as error:
-        print(f"데이터 생성 중 오류 발생: {error}")
-        db_connection.rollback()
-
-    finally:
-        if db_cursor:
-            db_cursor.close()
-
-create_routes_and_connections(db_connection)
 db_cursor = db_connection.cursor()
 def get_passenger_info():
     try:
@@ -367,6 +290,90 @@ def make_payment(passenger_id, train_id, carriage_num, seat_num, time_id, route_
     except Exception as e:
         db_connection.rollback()
         print(f"결제 중 오류 발생: {e}")
+
+
+db_cursor = db_connection.cursor()
+def return_time_table():
+    return 1
+
+def find_zero_positions(num):
+    binary_string = format(num, 'b') # 숫자를 이진 문자열로 변환
+    zero_positions = []
+
+    # 이진 문자열을 뒤집어서 0의 위치를 찾음 (0번 인덱스부터 시작)
+    for i, bit in enumerate(reversed(binary_string)):
+        if bit == '0':
+            zero_positions.append(i)
+
+    return zero_positions
+def search_seat(time_id, train_id):
+    #train 정보 불러오기
+    query = "SELECT * FROM Train WHERE TrainID = %s"
+    db_cursor.execute(query, (train_id,))
+    searched_train_info = db_cursor.fetchall()
+
+    seat_arr_per_time = {}
+    if not searched_train_info:
+        print("search trin table error")
+
+    #seat의 처음 좌석 정보 불러오기
+    query = "SELECT * FROM seat WHERE TimeID = %s AND TrainID = %s"
+    db_cursor.execute(query, (time_id[0], train_id,))
+    searched_seat_table = db_cursor.fetchall()
+    for i in range(0, searched_train_info[1]):
+        seat_arr_per_time.append(searched_seat_table[2])
+
+    for i in range (len(time_id)):
+        #좌석정보 불러오기
+        query = "SELECT * FROM seat WHERE TimeID = %s AND TrainID = %s"
+        db_cursor.execute(query, (time_id[i], train_id,))
+        searched_seat_table = db_cursor.fetchall()
+        for j in range (0,searched_train_info[1]):
+            seat_arr_per_time[j] = seat_arr_per_time[j] | searched_seat_table[j][2]
+
+    seat_cal_result = {}
+    for i in range (0 , searched_train_info[1]):
+        seat_cal_result.append(find_zero_positions(seat_arr_per_time[i]))
+
+    for i in range (len(seat_cal_result)):
+        bi_result = find_zero_positions(seat_cal_result[i])
+        for j in range (len(bi_result[i])):
+            print(i + " carrier have seat " + bi_result[i])
+
+    while True:
+        carrier_num = input("객차를 선택해 주세요 : ")
+        seat_num = input("좌석을 선택해 주세요 : ")
+        bi_result = find_zero_positions(seat_cal_result[i])
+        if not bi_result[seat_num] :
+            break
+    return carrier_num, seat_num
+
+
+def payment():
+    while True:
+        start_station = input("출발역을 입력해주세요 : ")
+        query = "SELECT * FROM station WHERE StationName = %s"
+        db_cursor.execute(query, (start_station,))
+        start_id = db_cursor.fetchall()
+        if start_id:
+            break
+    while True:
+        end_station = input("출발역을 입력해주세요 : ")
+        query = "SELECT * FROM station WHERE stationname = %s"
+        db_cursor.execute(query, (start_station,))
+        end_id = db_cursor.fetchall()
+        if end_id and start_station != end_station:
+            break
+    selected_time_id = return_time_table(start_id[0],end_id[0])
+    query = "SELECT * FROM station WHERE StartID = %s EndID = %s"
+    db_cursor.execute(query, (start_id[0],end_id[0]))
+    route_id = db_cursor.fetchall()
+    if not route_id:
+        print ("route find error")
+    seat_select = search_seat(selected_time_id[0], selected_time_id[1])
+
+
+
 
 def complete_refund(payment_id):
     try:
