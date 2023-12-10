@@ -7,8 +7,6 @@ drop table IF EXISTS Payment;
 drop table IF EXISTS PointPay;
 drop table IF EXISTS CargoPayment;
 drop table IF EXISTS connected_route;
-drop table IF EXISTS DetailedRoute;
-drop table IF EXISTS Seat;
 drop table IF EXISTS Passenger;
 drop table IF EXISTS Route;
 drop table IF EXISTS Fare;
@@ -20,13 +18,15 @@ drop table IF EXISTS CargoCustomer;
 DROP TABLE IF EXISTS ActualOperation;
 DROP TABLE IF EXISTS LostItems;
 DROP TABLE IF EXISTS AccidentInfo;
+DROP TABLE IF EXISTS WorkSchedule;
 DROP TABLE IF EXISTS ConvenienceFacility;
+drop table IF EXISTS Seat;
+drop table IF EXISTS Timetable;
+drop table IF EXISTS DetailedRoute;
 DROP TABLE IF EXISTS Station;
 DROP TABLE IF EXISTS AttendanceRecord;
 DROP TABLE IF EXISTS CustomerConsultationRecord;
-DROP TABLE IF EXISTS WorkSchedule;
 DROP TABLE IF EXISTS Employee;
-DROP TABLE IF EXISTS Timetable;
 DROP TABLE IF EXISTS stock;
 DROP TABLE IF EXISTS product_info;
 DROP TABLE IF EXISTS vending_payment;
@@ -36,6 +36,7 @@ DROP TABLE IF EXISTS maintenance;
 drop table IF EXISTS Train;
 DROP TABLE IF EXISTS Train_compartment;
 DROP TABLE IF EXISTS Service_Type;
+
 
 CREATE TABLE IF NOT EXISTS Station (
     StationID INT PRIMARY KEY AUTO_INCREMENT,
