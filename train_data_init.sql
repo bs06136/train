@@ -18,6 +18,7 @@ INSERT INTO Passenger (PassengerID) VALUES
 (4),
 (5);
 
+
 INSERT INTO Train (TrainID, Num) VALUES
 (1, 101),
 (2, 102),
