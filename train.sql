@@ -594,8 +594,6 @@ BEGIN
 END //
 DELIMITER ;
 
-
-
 -- 새로운 물품 분실 정보 삽입 시 처리
 DELIMITER //
 CREATE PROCEDURE HandleLostItem(IN ownerName VARCHAR(255), IN itemInfo TEXT, IN dateInfo DATE, IN foundLocation INT, IN processingStatus VARCHAR(50))
@@ -646,7 +644,9 @@ BEGIN
 END //
 DELIMITER ;
 
--- 결제 정보를 업데이트하여 환불 여부를 나타내는 프로시저
+
+-- 결제 정보를 업데이트하여 환불 여부를 나타낸다
+
 DELIMITER //
 CREATE PROCEDURE UpdatePaymentForRefund(IN paymentID INT)
 BEGIN
