@@ -1,147 +1,628 @@
--- 역 테이블 데이터 삽입
-INSERT INTO Station (Station_Name, Location)
-VALUES ('서울역','서울 용산구 한강대로 405'),
-      ('광명역','경기 광명시 광명역로 21'),
-       ('대전역','대전 동구 중앙로 215'),
-       ('대구역','대구 북구 태평로 161'),
-       ('울산역','울산 울주군 삼남읍 울산역로 177'),
-       ('부산역','부산 동구 중앙대로 206'),
-       ('전주역','전북 전주시 덕진구 동부대로 680'),
-       ('강릉역','강원 강릉시 용지로 176'),
-       ('신경주역','경북 경주시 건천읍 경주역로 80'),
-       ('광주역','광주 북구 무등로 235'),
-('정동진역','강원 정동진');
-
--- 시간표 테이블 데이터 삽입
-INSERT INTO Timetable (Departure_Time, Arrival_Time) VALUES
-('09:00:00', '11:00:00',1),
-('10:30:00', '13:00:00',2),
-('13:45:00', '16:30:00',3),
-('15:20:00', '18:10:00',4),
-('17:40:00', '20:15:00',5),
-('19:15:00', '22:00:00',6),
-('21:00:00', '23:30:00',7),
-('23:10:00', '02:00:00',8),
-('02:30:00', '05:15:00',9),
-('04:45:00', '07:30:00',10);
-
--- 경로 테이블 데이터 삽입
-INSERT INTO Path (Start_Station_ID, End_Station_ID, Timetable_ID) VALUES
-(1, 5, 1),
-(2, 8, 2),
-(3, 7, 3),
-(4, 10, 4),
-(5, 9, 5),
-(6, 4, 6),
-(7, 3, 7),
-(8, 2, 8),
-(9, 1, 9),
-(10, 6, 10);
-
--- 실제운행 테이블 데이터 삽입
-INSERT INTO Actual_Run (Run_Date, Actual_Departure_Time, Actual_Arrival_Time, Station_ID) VALUES
-('2023-12-01', '09:05:00', '11:10:00', 1),
-('2023-12-01', '10:35:00', '13:05:00', 2),
-('2023-12-01', '13:50:00', '16:35:00', 3),
-('2023-12-01', '15:25:00', '18:15:00', 4),
-('2023-12-01', '17:45:00', '20:20:00', 5),
-('2023-12-01', '19:20:00', '22:05:00', 6),
-('2023-12-01', '21:05:00', '23:35:00', 7),
-('2023-12-01', '23:15:00', '02:05:00', 8),
-('2023-12-01', '02:35:00', '05:20:00', 9),
-('2023-12-01', '04:50:00', '07:35:00', 10);
-
--- 연결경로 테이블 데이터 삽입
-INSERT INTO Connected_Path (Path_ID, Number, Inter_Station_ID) VALUES
-(1, 1, 2),
-(1, 2, 3),
-(1, 3, 4),
-(2, 4, 5),
-(2, 5, 6),
-(2, 6, 7),
-(3, 7, 8),
-(3, 8, 9),
-(3, 9, 10),
-(4, 10, 11);
-
--- 상세경로 테이블 데이터 삽입
-INSERT INTO Detailed_Path (Path_ID, Departure_Station_ID, Arrival_Station_ID, Interval) VALUES
-(1, 1, 5, '00:30:00'),
-(2, 2, 8, '00:30:00'),
-(3, 3, 7, '00:30:00'),
-(4, 4, 10, '00:30:00'),
-(5, 5, 9, '00:30:00'),
-(6, 6, 4, '00:30:00'),
-(7, 7, 3, '00:30:00'),
-(8, 8, 2, '00:30:00'),
-(9, 9, 1, '00:30:00'),
-(10, 10, 6, '00:30:00');
-
--- 노선 테이블 데이터 삽입
-INSERT INTO Route (Route_Name, Start_Station_ID, End_Station_ID) VALUES
-('노선1', 1, 5),
-('노선2', 2, 8),
-('노선3', 3, 7),
-('노선4', 4, 10),
-('노선5', 5, 9),
-('노선6', 6, 4),
-('노선7', 7, 3),
-('노선8', 8, 2),
-('노선9', 9, 1),
-('노선10', 10, 6);
+DROP TABLE IF EXISTS
+`train2`.`Cargo_carriage`,
+`train2`.`Carriage`,
+`train2`.`CommercialUse_carriage`,
+`train2`.`Connected_Path`,
+`train2`.`Detailed_Path`,
+`train2`.`ITX`,
+`train2`.`In_flight_Meal_ID`,
+`train2`.`Ktx`,
+`train2`.`MaintenanceID`,
+`train2`.`MaintenanceRecord`,
+`train2`.`Mugunghwa`,
+`train2`.`Passenger_Fare`,
+`train2`.`Path`,
+`train2`.`Route`,
+`train2`.`Saemaeul`,
+`train2`.`Service_Fare`,
+`train2`.`Special_Fare`,
+`train2`.`Station`,
+`train2`.`Timetable`,
+`train2`.`cargo_compartment_fare`,
+`train2`.`container_fare`,
+`train2`.`locomotive`,
+`train2`.`passengers_carriage`,
+`train2`.`seat`,
+`train2`.`train`,
+`train2`.`Actual_Run`,
+`train2`.`Additional_Service_ID`,
+`train2`.`Cargo_Fare`,
+`train2`.`Fare`,
+`train2`.`Normal_Fare`,
+`train2`.`Season_Fare`,
+`train2`.`company_user`,
+`train2`.`individual_user`,
+`train2`.`refund`,
+`train2`.`payment`,
+`train2`.`service_payment`,
+`train2`.`ticket_payment`,
+`train2`.`user`,
+`train2`.`user_id`,
+`train2`.`user_password`,
+`train2`.`cargo_payment`;
 
 
 
--- 서비스 타입 데이터 삽입
-INSERT INTO Service_Type (Service_Type_ID, Service_Name) VALUES
-(1, '서비스1'),
-(2, '서비스2'),
-(3, '서비스3');
+/*
+<경로 테이블(Path)>
+경로ID (Path_ID, PK)
+시작역ID (Start_Station_ID, FK)
+종료역ID (End_Station_ID, FK)
+시간표ID (Timetable_ID, FK)
 
--- 화물 데이터 삽입
-INSERT INTO Cargo (Cargo_ID, Cargo_Type) VALUES
-(1, '화물1'),
-(2, '화물2'),
-(3, '화물3');
+<시간표 테이블(Timetable)>
+시간표ID (Timetable_ID, PK)
+출발시간 (Departure_Time)
+도착시간 (Arrival_Time)
+결제ID (Payment_ID, FK)
 
--- 승객 타입 데이터 삽입
-INSERT INTO Passenger_Type (Passenger_Type_ID, Passenger_Type_Name) VALUES
-(1, '일반요금'),
-(2, '특수요금'),
-(3, '정기권');
+<역 테이블(Station)>
+역ID (Station_ID, PK)
+역명 (Station_Name)
+위치 (Location)
 
--- 요금 데이터 삽입
-INSERT INTO Fare (Fare_ID, Service_Type_ID, Cargo_ID, Passenger_Type_ID, Amount) VALUES
-(1, 1, 2, 1, 100.00),
-(2, 2, 1, 3, 75.50),
-(3, 3, 3, 2, 120.75);
+<실제운행 테이블(Actual_Run)>
+운행ID (Run_ID, PK)
+운행날짜 (Run_Date)
+실제출발시간 (Actual_Departure_Time)
+실제도착시간 (Actual_Arrival_Time)
+역ID (Station_ID, FK)
 
--- 할인 데이터 삽입
-INSERT INTO Promotion (Promotion_ID, Fare_ID, Discount) VALUES
-(1, 1, 0.10),
-(2, 2, 0.15),
-(3, 3, 0.05);
+<연결경로 테이블(Connected_Path)>
+연결ID (Connection_ID, PK)
+경로ID(Path_ID,FK)
+순서(Number)
+중간역(Inter_Station_ID,FK)
 
--- 부가서비스 데이터 삽입
-INSERT INTO Additional_Service (Additional_Service_ID, Service_Type_ID, Service_Name) VALUES
-(1, 1, '부가서비스1'),
-(2, 2, '부가서비스2'),
-(3, 3, '부가서비스3');
+<상세경로 테이블(Detailed_Path)>
+상세ID (Detail_ID, PK)
+경로ID (Path_ID, FK)
+출발역ID(Departure_Station_ID,FK)
+도착역ID(Arrival_Station_ID,FK)
+간격(Interval)
 
--- 기내식 데이터 삽입
-INSERT INTO In_flight_Meal (In_flight_Meal_ID, Service_Type_ID, Meal_Type) VALUES
-(1, 1, '기내식1'),
-(2, 2, '기내식2'),
-(3, 3, '기내식3');
+<노선 테이블(Route)>
+노선ID (Route_ID, PK)
+노선명 (Route_Name)
+시작역ID (Start_Station_ID, FK)
+종료역ID (End_Station_ID, FK)
 
--- 화물칸 데이터 삽입
-INSERT INTO Cargo_Cabin (Cargo_Cabin_ID, Cargo_ID, Cabin_Type) VALUES
-(1, 1, '칸1'),
-(2, 2, '칸2'),
-(3, 3, '칸3');
+*/
 
--- 컨테이너 데이터 삽입
-INSERT INTO Container (Container_ID, Cargo_ID, Container_Type) VALUES
-(1, 1, '컨테이너1'),
-(2, 2, '컨테이너2'),
-(3, 3, '컨테이너3');
+
+CREATE TABLE IF NOT EXISTS `train2`.`Station` (
+  `Station_ID` INT NOT NULL,
+  `Station_Name` INT NOT NULL,
+  `Location` INT NOT NULL,
+  PRIMARY KEY (`Station_ID`)
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Path` (
+  `Path_ID` INT NOT NULL,
+  `Start_Station_ID` INT NOT NULL,
+  `End_Station_ID` INT NOT NULL,
+  PRIMARY KEY (`Path_ID`),
+  FOREIGN KEY (Start_Station_ID) REFERENCES `train2`.`Station`(`Station_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (End_Station_ID) REFERENCES `train2`.`Station`(`Station_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Timetable` (
+  `Timetable_ID` INT NOT NULL,
+  `Departure_Time` INT NOT NULL,
+  `Arrival_Time` INT NOT NULL,
+  `Path_ID` INT NOT NULL,
+  PRIMARY KEY (`Timetable_ID`),
+  FOREIGN KEY (Path_ID) REFERENCES `train2`.`Path`(`Path_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Connected_Path` (
+  `Path_ID` INT NOT NULL,
+  `order` INT NOT NULL,
+  `Departure_Station_ID` INT NOT NULL,
+  `End_Station_ID` INT NOT NULL,
+  PRIMARY KEY (`Path_ID`, `order`),
+  FOREIGN KEY (Path_ID) REFERENCES `train2`.`Path`(`Path_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (Departure_Station_ID) REFERENCES `train2`.`Station`(`Station_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (End_Station_ID) REFERENCES `train2`.`Station`(`Station_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Detailed_Path` (
+  `Path_ID` INT NOT NULL,
+  `Departure_Station_ID` INT NOT NULL,
+  `End_Station_ID` INT NOT NULL,
+  PRIMARY KEY (`Path_ID`),
+  FOREIGN KEY (Path_ID) REFERENCES `train2`.`Path`(`Path_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (Departure_Station_ID) REFERENCES `train2`.`Station`(`Station_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (End_Station_ID) REFERENCES `train2`.`Station`(`Station_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Route` (
+  `Route_ID` INT NOT NULL,
+  `Route_Name` INT NOT NULL,
+  `Start_Station_ID` INT NOT NULL,
+  `End_Station_ID` INT NOT NULL,
+  PRIMARY KEY (`Route_ID`),
+  FOREIGN KEY (Route_ID) REFERENCES `train2`.`Path`(`Path_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (Start_Station_ID) REFERENCES `train2`.`Station`(`Station_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (End_Station_ID) REFERENCES `train2`.`Station`(`Station_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Actual_Run` (
+  `Actual_Run_ID` INT NOT NULL,
+  `Run_Date` INT NOT NULL,
+  `Actual_Departure_Time` INT NOT NULL,
+  `Actual_Arrival_Time` INT NOT NULL,
+  `Station_ID` INT NOT NULL,
+  PRIMARY KEY (`Actual_Run_ID`),
+  FOREIGN KEY (Station_ID) REFERENCES `train2`.`Station`(`Station_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+/*
+좌석 SeatID, SeatNum, SeatClass, TrainID(Fk)
+열차 TrainID, Traintype,
+기관차 LocomotiveID, ManufactureYear, Manufacturer, MaintenanceID
+객차 CarriageID, ManufactureYear, Manufacturer, MaintenanceID
+정비_ID MaintenanceID, MaintenanceRecordID
+정비기록 MaintenanceRecordID, MaintenanceDate, Mechanic, MaintenanceDetails
+KTX Ktx_ID, TrainNum
+ITX Itx_ID, TrainNum
+새마을 Saemaeul_ID, TrainNum
+무궁화 Mugunghwa_ID, TrainNum
+승객용 ForPassengers_ID, Capacity
+화물용 ForCarriage_ID, CarriageNum, MaximumWeight
+상업용 CommercialUse_ID, ProductName, ProductInfo
+*/
+USE train2;
+
+CREATE TABLE IF NOT EXISTS `train2`.`train` (
+  `TrainID` INT NOT NULL,
+  `Traintype` INT NOT NULL,
+  PRIMARY KEY (`TrainID`)
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`seat` (
+  `SeatID` INT NOT NULL,
+  `SeatNum` INT NOT NULL,
+  `SeatClass` INT NOT NULL,
+  `TrainID` INT NOT NULL,
+  `Timetable_id` INT NOT NULL,
+  PRIMARY KEY (`SeatID`),
+  FOREIGN KEY (TrainID) REFERENCES `train2`.`Train`(`TrainID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (Timetable_id) REFERENCES `train2`.`Timetable`(`Timetable_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`locomotive` (
+  `LocomotiveID` INT NOT NULL,
+  `TrainID` INT NOT NULL,
+  `Order` INT NOT NULL,
+  `ManufactureYear` INT NOT NULL,
+  `Manufacturer` INT NOT NULL,
+  PRIMARY KEY (`LocomotiveID`),
+  FOREIGN KEY (TrainID) REFERENCES `train2`.`Train`(`TrainID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Carriage` (
+  `CarriageID` INT NOT NULL,
+  `TrainID` INT NOT NULL,
+  `Order` INT NOT NULL,
+  `ManufactureYear` INT NOT NULL,
+  `Manufacturer` INT NOT NULL,
+  PRIMARY KEY (`CarriageID`),
+  FOREIGN KEY (TrainID) REFERENCES `train2`.`Train`(`TrainID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`MaintenanceID` (
+  `MaintenanceID` INT NOT NULL,
+  `MaintenanceRecordID` INT NOT NULL,
+  `LocomotiveID` INT,
+  `CarriageID` INT,
+  PRIMARY KEY (`MaintenanceID`),
+  FOREIGN KEY (CarriageID) REFERENCES `train2`.`Carriage`(`CarriageID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (LocomotiveID) REFERENCES `train2`.`locomotive`(`LocomotiveID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`MaintenanceRecord` (
+  `MaintenanceRecordID` INT NOT NULL,
+  `MaintenanceID` INT NOT NULL,
+  `MaintenanceDate` INT NOT NULL,
+  `Mechanic` INT NOT NULL,
+  `MaintenanceDetails` VARCHAR(255),
+  PRIMARY KEY (`MaintenanceRecordID`),
+  FOREIGN KEY (MaintenanceID) REFERENCES `train2`.`MaintenanceID`(`MaintenanceID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`passengers_carriage` (
+  `passengers_carriage_ID` INT NOT NULL,
+  `CarriageID` INT NOT NULL,
+  `Capacity` INT NOT NULL,
+  `Model_ID` INT NOT NULL,
+  PRIMARY KEY (`passengers_carriage_ID`),
+  FOREIGN KEY (CarriageID) REFERENCES `train2`.`Carriage`(`CarriageID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Cargo_carriage` (
+  `Cargo_carriage_ID` INT NOT NULL,
+  `CarriageID` INT NOT NULL,
+  `Capacity` INT NOT NULL,
+  `Model_ID` INT NOT NULL,
+  PRIMARY KEY (`Cargo_carriage_ID`),
+  FOREIGN KEY (CarriageID) REFERENCES `train2`.`Carriage`(`CarriageID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`CommercialUse_carriage` (
+  `CommercialUse_carriage_ID` INT NOT NULL,
+  `CarriageID` INT NOT NULL,
+  `Capacity` INT NOT NULL,
+  `Model_ID` INT NOT NULL,
+  PRIMARY KEY (`CommercialUse_carriage_ID`),
+  FOREIGN KEY (CarriageID) REFERENCES `train2`.`Carriage`(`CarriageID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Saemaeul` (
+  `Saemaeul_ID` INT NOT NULL,
+  `TrainID` INT NOT NULL,
+  PRIMARY KEY (`Saemaeul_ID`),
+  FOREIGN KEY (TrainID) REFERENCES `train2`.`Train`(`TrainID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Mugunghwa` (
+  `Mugunghwa_ID` INT NOT NULL,
+  `TrainID` INT NOT NULL,
+  PRIMARY KEY (`Mugunghwa_ID`),
+  FOREIGN KEY (TrainID) REFERENCES `train2`.`Train`(`TrainID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Ktx` (
+  `Ktx_ID` INT NOT NULL,
+  `TrainID` INT NOT NULL,
+  PRIMARY KEY (`Ktx_ID`),
+  FOREIGN KEY (TrainID) REFERENCES `train2`.`Train`(`TrainID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`ITX` (
+  `ITX_ID` INT NOT NULL,
+  `TrainID` INT NOT NULL,
+  PRIMARY KEY (`ITX_ID`),
+  FOREIGN KEY (TrainID) REFERENCES `train2`.`Train`(`TrainID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+/*
+
+-- 요금 테이블 --
+    요금ID (Fare_ID INT PRIMARY KEY)
+    서비스타입ID (Service_Type_ID INT)
+    화물ID (Cargo_ID INT)
+    승객타입ID (Passenger_Type_ID INT)
+    Amount DECIMAL(10, 2)
+    FOREIGN KEY (Service_Type_ID) REFERENCES Service_Type (Service_Type_ID)
+    FOREIGN KEY (Cargo_ID) REFERENCES Cargo (Cargo_ID)
+    FOREIGN KEY (Passenger_Type_ID) REFERENCES Passenger_Type (Passenger_Type_ID)
+
+-- 할인 테이블 --
+    할인ID (Promotion_ID INT PRIMARY KEY)
+    요금ID (Fare_ID INT)
+    Discount DECIMAL(5, 2),
+    FOREIGN KEY (Fare_ID) REFERENCES Fare (Fare_ID)
+
+
+-- 서비스 타입 테이블 --
+    서비스타입ID (Service_Type_ID INT PRIMARY KEY)
+    서비스 이름 (Service_Name VARCHAR(50))
+
+-- 부가서비스 테이블 --
+    부가서비스ID (Additional_Service_ID INT PRIMARY KEY)
+    서비스타입ID (Service_Type_ID INT)
+    서비스이름 (Service_Name VARCHAR(50))
+    FOREIGN KEY (Service_Type_ID) REFERENCES Service_Type (Service_Type_ID)
+
+
+-- 기내식 테이블 --
+    기내식ID (In_flight_Meal_ID INT PRIMARY KEY)
+    서비스타입ID (Service_Type_ID INT)
+    음식타입 (Meal_Type VARCHAR(50))
+    FOREIGN KEY (Service_Type_ID) REFERENCES Service_Type (Service_Type_ID)
+
+-- 화물 테이블 --
+    화물ID (Cargo_ID INT PRIMARY KEY)
+    화물타입 (Cargo_Type VARCHAR(50))
+
+-- 화물칸 테이블 --
+    화물칸ID (Cargo_Cabin_ID INT PRIMARY KEY)
+    화물ID (Cargo_ID INT)
+    칸타입 (Cabin_Type VARCHAR(50))
+    FOREIGN KEY (Cargo_ID) REFERENCES Cargo (Cargo_ID)
+
+-- 컨테이너 테이블 --
+    컨테이너ID (Container_ID INT PRIMARY KEY)
+    화물ID (Cargo_ID INT)
+    컨테이너타입 (Container_Type VARCHAR(50))
+    FOREIGN KEY (Cargo_ID) REFERENCES Cargo (Cargo_ID)
+
+-- 승객 타입 테이블 --
+    승객타입ID (Passenger_Type_ID INT PRIMARY KEY)
+    승객타입이름 (Passenger_Type_Name VARCHAR(50))
+ */
+
+
+
+CREATE TABLE IF NOT EXISTS `train2`.`Fare` (
+  `Fare_ID` INT NOT NULL,
+  `Amount` DECIMAL(10, 2),
+  PRIMARY KEY (`Fare_ID`)
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Passenger_Fare` (
+  `Fare_ID` INT NOT NULL,
+  `Fare_detail_ID` INT NOT NULL,
+  `Amount` DECIMAL(10, 2),
+  PRIMARY KEY (`Fare_ID`),
+  FOREIGN KEY (Fare_ID) REFERENCES `train2`.`Fare`(Fare_ID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Cargo_Fare` (
+  `Fare_ID` INT NOT NULL,
+  `Cargo_detail_ID` INT NOT NULL,
+  `Amount` DECIMAL(10, 2),
+  PRIMARY KEY (`Fare_ID`),
+  FOREIGN KEY (Fare_ID) REFERENCES `train2`.`Fare` (Fare_ID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Service_Fare` (
+  `Fare_ID` INT NOT NULL,
+  `Service_Detail_ID` INT NOT NULL,
+  `Amount` DECIMAL(10, 2),
+  PRIMARY KEY (`Fare_ID`),
+  FOREIGN KEY (Fare_ID) REFERENCES `train2`.`Fare` (Fare_ID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Normal_Fare` (
+  `Fare_ID` INT NOT NULL,
+  `Amount` DECIMAL(10, 2),
+  `Condition` INT NOT NULL,
+  `Service_Name` VARCHAR(50),
+  PRIMARY KEY (`Fare_ID`),
+  FOREIGN KEY (Fare_ID) REFERENCES `train2`.`Passenger_Fare` (Fare_ID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Special_Fare` (
+  `Fare_ID` INT NOT NULL,
+  `Amount` DECIMAL(10, 2),
+  `Condition` INT NOT NULL,
+  `Service_Name` VARCHAR(50),
+  PRIMARY KEY (`Fare_ID`),
+  FOREIGN KEY (Fare_ID) REFERENCES `train2`.`Passenger_Fare` (Fare_ID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Season_Fare` (
+  `Fare_ID` INT NOT NULL,
+  `Amount` DECIMAL(10, 2),
+  `Condition` INT NOT NULL,
+  `Service_Name` VARCHAR(50),
+  PRIMARY KEY (`Fare_ID`),
+  FOREIGN KEY (Fare_ID) REFERENCES `train2`.`Passenger_Fare` (Fare_ID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`cargo_compartment_fare`
+(
+    `Fare_ID`   INT NOT NULL,
+    `Amount`    DECIMAL(10, 2),
+    `Condition` INT NOT NULL,
+    `Service_Name` VARCHAR(50),
+    PRIMARY KEY (`Fare_ID`),
+    FOREIGN KEY (Fare_ID) REFERENCES `train2`.`Cargo_Fare` (Fare_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`container_fare`
+(
+    `Fare_ID`   INT NOT NULL,
+    `Amount`    DECIMAL(10, 2),
+    `Condition` INT NOT NULL,
+    `Service_Name` VARCHAR(50),
+    PRIMARY KEY (`Fare_ID`),
+    FOREIGN KEY (Fare_ID) REFERENCES `train2`.`Cargo_Fare` (Fare_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`In_flight_Meal_ID`
+(
+    `Fare_ID`   INT NOT NULL,
+    `Amount`    DECIMAL(10, 2),
+    `Condition` INT NOT NULL,
+    `Service_Name` VARCHAR(50),
+    PRIMARY KEY (`Fare_ID`),
+    FOREIGN KEY (Fare_ID) REFERENCES `train2`.`Service_Fare` (Fare_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`Additional_Service_ID`
+(
+    `Fare_ID`   INT NOT NULL,
+    `Amount`    DECIMAL(10, 2),
+    `Condition` INT NOT NULL,
+    `Service_Name` VARCHAR(50),
+    PRIMARY KEY (`Fare_ID`),
+    FOREIGN KEY (Fare_ID) REFERENCES `train2`.`Service_Fare` (Fare_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`user`
+(
+    `user_id`   INT NOT NULL,
+    `name`    VARCHAR(20),
+    PRIMARY KEY (`user_id`)
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`user_id`
+(
+    `user_id`   INT NOT NULL,
+    `user_id_word`    VARCHAR(20),
+    PRIMARY KEY (`user_id`),
+    FOREIGN KEY (user_id) REFERENCES `train2`.`user` (user_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`user_password`
+(
+    `user_id`   INT NOT NULL,
+    `user_password`    VARCHAR(20),
+    PRIMARY KEY (`user_id`),
+    FOREIGN KEY (user_id) REFERENCES `train2`.`user` (user_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`individual_user`
+(
+    `user_id`   INT NOT NULL,
+    `user_name`    VARCHAR(20),
+    `user_age`   INT NOT NULL,
+    PRIMARY KEY (`user_id`),
+    FOREIGN KEY (user_id) REFERENCES `train2`.`user` (user_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`company_user`
+(
+    `user_id`   INT NOT NULL,
+    `user_name`    VARCHAR(20),
+    `company_num` INT NOT NULL,
+    PRIMARY KEY (`user_id`),
+    FOREIGN KEY (user_id) REFERENCES `train2`.`user` (user_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS `train2`.`payment`
+(
+    `payment_id`   INT NOT NULL,
+    `Fare_ID`    INT NOT NULL,
+    `seatID` INT NOT NULL,
+    `user_id` INT NOT NULL,
+    PRIMARY KEY (`payment_id`),
+    FOREIGN KEY (Fare_ID) REFERENCES `train2`.`Fare` (Fare_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (Fare_ID) REFERENCES `train2`.`seat` (seatID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES `train2`.`user` (user_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`ticket_payment`
+(
+    `payment_id`   INT NOT NULL,
+    `type`    VARCHAR(20),
+    `amount`   INT NOT NULL,
+    PRIMARY KEY (`payment_id`),
+    FOREIGN KEY (payment_id) REFERENCES `train2`.`payment` (payment_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`service_payment`
+(
+    `payment_id`   INT NOT NULL,
+    `type`    VARCHAR(20),
+    `amount`   INT NOT NULL,
+    PRIMARY KEY (`payment_id`),
+    FOREIGN KEY (payment_id) REFERENCES `train2`.`payment` (payment_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`cargo_payment`
+(
+    `payment_id`   INT NOT NULL,
+    `type`    VARCHAR(20),
+    `amount`   INT NOT NULL,
+    PRIMARY KEY (`payment_id`),
+    FOREIGN KEY (payment_id) REFERENCES `train2`.`payment` (payment_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `train2`.`refund`
+(
+    `payment_id`   INT NOT NULL,
+    `type`    VARCHAR(20),
+    `amount`   INT NOT NULL,
+    PRIMARY KEY (`payment_id`),
+    FOREIGN KEY (payment_id) REFERENCES `train2`.`payment` (payment_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);

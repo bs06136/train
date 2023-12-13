@@ -5,9 +5,9 @@ from datetime import datetime
 
 # MySQL 서버에 연결
 conn = mysql.connector.connect(
-  host="your_host",       # 데이터베이스 호스트 주소
-  user="your_username",   # 데이터베이스 사용자 이름
-  password="your_password" # 데이터베이스 비밀번호
+  host="localhost",       # 데이터베이스 호스트 주소
+  user="bs06136",   # 데이터베이스 사용자 이름
+  password="zxc123" # 데이터베이스 비밀번호
 )
 
 # 커서 객체 생성
@@ -188,7 +188,7 @@ db_connection = mysql.connector.connect(
 
 try:
     # SQL 파일 열기
-    with open('train2_table_init.sql', 'r', encoding='utf-8') as file:
+    with open('train2_data_init.sql', 'r', encoding='utf-8') as file:
         sql_script = file.read()
 
     # SQL 명령어를 ';' 기준으로 분리
@@ -214,7 +214,7 @@ finally:
 
 try:
     # SQL 파일 열기
-    with open('train2_data_init.sql', 'r', encoding='utf-8') as file:
+    with open('train2_table_init.sql', 'r', encoding='utf-8') as file:
         sql_script = file.read()
 
     # SQL 명령어를 ';' 기준으로 분리
