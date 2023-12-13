@@ -14,8 +14,15 @@ conn = mysql.connector.connect(
 cursor = conn.cursor()
 
 # 새 데이터베이스 생성
-cursor.execute("CREATE DATABASE train")
-cursor.execute("CREATE DATABASE train2")
+cursor.execute("SHOW DATABASES")
+databases = [db[0] for db in cursor.fetchall()]
+if "train" not in databases:
+    # 스키마가 존재하지 않으면 생성
+    cursor.execute("CREATE DATABASE train")
+if "train2" not in databases:
+    # 스키마가 존재하지 않으면 생성
+    cursor.execute("CREATE DATABASE train2")
+
 
 # 연결 종료
 cursor.close()

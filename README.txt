@@ -2,4 +2,4 @@ data_create.py에 db의 아이디와 비밀번호를 입력하면 데이터 생�
 
 구현코드는 main.py입니다.
 
-프로시저, 함수, 트리거는
+db 스키마는 db_project_schema.sql 파일을 import하면 볼 수 있습니다.

@@ -1,3 +1,5 @@
+-- USE train;
+
 DROP TABLE IF EXISTS Refund;
 DROP TABLE IF EXISTS feedback;
 DROP TABLE IF EXISTS Service_Payment;
@@ -31,8 +33,8 @@ DROP TABLE IF EXISTS vending_payment;
 DROP TABLE IF EXISTS vending_machine;
 DROP TABLE IF EXISTS maintenance_record;
 DROP TABLE IF EXISTS maintenance;
-DROP TABLE IF EXISTS Train_compartment;
 drop table IF EXISTS Train;
+DROP TABLE IF EXISTS Train_compartment;
 DROP TABLE IF EXISTS Service_Type;
 
 
@@ -96,25 +98,24 @@ CREATE TABLE IF NOT EXISTS `train`.`Promotion` (
   PRIMARY KEY (`PromotionID`)
 );
 
+CREATE TABLE IF NOT EXISTS `train`.`Train_compartment` (
+  `compartment_type_id` INT NOT NULL,
+  `seat_num` INT NOT NULL,
+  PRIMARY KEY (`compartment_type_id`)
+);
+
 CREATE TABLE IF NOT EXISTS `train`.`Train` (
   `TrainID` INT NOT NULL,
   `Num` INT NOT NULL,
-  PRIMARY KEY (`TrainID`)
-);
-
-CREATE TABLE IF NOT EXISTS `train`.`Train_compartment` (
-  `TrainID` INT NOT NULL,
-  `Num` INT NOT NULL,
-  `compartment_type_id` INT NOT NULL,
-  `seat_num` INT NOT NULL,
-  PRIMARY KEY (`TrainID`, `Num`),
-  FOREIGN KEY (TrainID) REFERENCES `train`.`Train`(`TrainID`)
+  `Train_compartment_type` INT NOT NULL,
+  PRIMARY KEY (`TrainID`),
+  FOREIGN KEY (Train_compartment_type) REFERENCES `train`.`Train_compartment`(`compartment_type_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `train`.`Timetable` (
-  `TimeID` INT NOT NULL AUTO_INCREMENT,
+  `TimeID` INT NOT NULL,
   TrainID INT,
   departure_time TIME,
   arrival_time TIME,
@@ -139,7 +140,7 @@ CREATE TABLE IF NOT EXISTS `train`.`Seat` (
   FOREIGN KEY (`TrainID`) REFERENCES `train`.`Train` (`TrainID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  FOREIGN KEY (`TimeID`) REFERENCES `train`.`Timetable` (`TimeID`)
+  FOREIGN KEY (`TimeID`) REFERENCES `train`.`Timetable` (`TimeID`) 
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
@@ -253,7 +254,7 @@ CREATE TABLE IF NOT EXISTS ActualOperation (
     DepartureTime DATETIME,
     ArrivalTime DATETIME,
     Changes TEXT,
-
+    
     FOREIGN KEY (TimetableID) REFERENCES Timetable(`TimeID`),
     FOREIGN KEY (DepartureStationID) REFERENCES Station(StationID),
     FOREIGN KEY (ArrivalStationID) REFERENCES Station(StationID)
@@ -269,7 +270,7 @@ CREATE TABLE IF NOT EXISTS LostItems (
     DateInfo DATE,
     FoundLocation INT,
     ProcessingStatus VARCHAR(50),
-
+    
     FOREIGN KEY (FoundLocation) REFERENCES Station(StationID)
 );
 
@@ -282,7 +283,7 @@ CREATE TABLE IF NOT EXISTS AccidentInfo (
     AccidentType VARCHAR(255),
     InjuredCount INT,
     ActionTaken TEXT,
-
+    
     FOREIGN KEY (StationID) REFERENCES Station(StationID)
 );
 
@@ -305,7 +306,7 @@ CREATE TABLE IF NOT EXISTS WorkSchedule (
     WorkType VARCHAR(255),
     WorkDescription TEXT,
     WorkStatus VARCHAR(50),
-
+    
     FOREIGN KEY (ScheduleID) REFERENCES `TimeTable`(`TimeID`),
     FOREIGN KEY (EmployeeID) REFERENCES `Employee`(id)
 );
@@ -317,7 +318,7 @@ CREATE TABLE IF NOT EXISTS AttendanceRecord (
     AttendanceDateTime DATETIME,
     AttendanceStatus VARCHAR(50),
     AttendanceLocation VARCHAR(255),
-
+    
     FOREIGN KEY (EmployeeID) REFERENCES Employee(id)
 );
 
@@ -330,11 +331,11 @@ CREATE TABLE IF NOT EXISTS CustomerConsultationRecord (
     ConsultationType VARCHAR(255),
     ConsultationContent TEXT,
     ProcessingStatus VARCHAR(50),
-
+    
     FOREIGN KEY (EmployeeID) REFERENCES Employee(id)
 );
 
-
+                    
 CREATE TABLE IF NOT EXISTS `train`.`Refund` (
 refund_id INT PRIMARY KEY AUTO_INCREMENT,
 `PaymentID` INT NOT NULL,
@@ -373,19 +374,19 @@ CREATE TABLE IF NOT EXISTS `train`.`vending_machine` (
   FOREIGN KEY (`TrainID`)
   REFERENCES `train`.`Train` (`TrainID`)
   );
-
+  
   CREATE TABLE IF NOT EXISTS `train`.`Vending_payment` (
   `Payment_ID` INT NOT NULL,
   `Payment_Date` DATE NOT NULL,
   `Payment_method` VARCHAR(45) NOT NULL,
   `Product_ID` INT NOT NULL,
   `Price` INT NOT NULL,
-  `Vending_machine_ID` INT NOT NULL,
+  `Vending_machine_ID` INT NOT NULL,  
   PRIMARY KEY (`Payment_ID`),
-  FOREIGN KEY (`Vending_machine_ID`)
+  FOREIGN KEY (`Vending_machine_ID`) 
   REFERENCES `train`.`Vending_Machine`(`Vending_machine_ID`)
   );
-
+  
 CREATE TABLE IF NOT EXISTS `train`.`product_info` (
   `Product_ID` INT NOT NULL,
   `Product_Name` VARCHAR(45) NOT NULL,
@@ -403,7 +404,7 @@ CREATE TABLE IF NOT EXISTS `train`.`stock` (
   PRIMARY KEY (`Stock_id`),
   FOREIGN KEY (`Vending_Machine_ID`)
   REFERENCES `train`.`Vending_Machine` (`Vending_Machine_ID`),
-  FOREIGN KEY (`Product_ID`)
+  FOREIGN KEY (`Product_ID`) 
   REFERENCES `train`.`Product_Info` (`Product_ID`)
 );
 
@@ -435,6 +436,8 @@ CREATE TABLE IF NOT EXISTS `train`.`maintenance_record` (
   PRIMARY KEY (`Feedback_ID`)
   );
 
+/*
+#drop table employees;
 DELIMITER //
 CREATE PROCEDURE InsertStation(IN StationName VARCHAR(255), IN Location VARCHAR(255), IN PlatformCount INT)
 BEGIN
@@ -506,8 +509,8 @@ BEGIN
     VALUES (cargoID, routeID, fareID, paymentAmount, paymentDate);
 
     -- 화물 결제 정보를 Payment 테이블에 추가
-    INSERT INTO Payment (RouteID, FareID)
-    VALUES (routeID, fareID);
+    INSERT INTO Payment (CargoID, RouteID, FareID, PaymentAmount, PaymentDate)
+    VALUES (cargoID, routeID, fareID, paymentAmount, paymentDate);
 END //
 DELIMITER ;
 
@@ -546,6 +549,13 @@ BEGIN
         CargoWeight INT
     );
 
+    -- 콤마(,)를 기준으로 문자열을 분리하여 TempCargoData 테이블에 삽입
+    INSERT INTO TempCargoData (CargoType, CargoWeight)
+    SELECT CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(cargoDataList, ',', n.digit+1), ',', -1) AS UNSIGNED) AS CargoType,
+           CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(cargoDataList, ',', n.digit+1), ',', -1) AS UNSIGNED) AS CargoWeight
+    FROM generator_1_to_1000 n
+    WHERE n.digit < LENGTH(cargoDataList) - LENGTH(REPLACE(cargoDataList, ',', '')) + 1;
+
     -- 화물 정보 삽입
     INSERT INTO Cargo (CargoType, CargoWeight)
     SELECT CargoType, CargoWeight FROM TempCargoData;
@@ -573,8 +583,8 @@ BEGIN
     VALUES (cargoID, routeID, fareID, paymentAmount, CURRENT_DATE);
 
     -- 화물 결제 정보를 Payment 테이블에 추가
-    INSERT INTO Payment (RouteID, FareID)
-    VALUES (routeID, fareID);
+    INSERT INTO Payment (CargoID, RouteID, FareID, PaymentAmount, PaymentDate)
+    VALUES (cargoID, routeID, fareID, paymentAmount, CURRENT_DATE);
 
     -- 임시 테이블 삭제
     DROP TEMPORARY TABLE IF EXISTS TempCargoData;
@@ -597,11 +607,9 @@ END //
 DELIMITER ;
 
 --  새로운 사고 정보 삽입 시 처리
-DELIMITER //
 CREATE PROCEDURE HandleAccident(IN stationID INT, IN accidentTime DATETIME, IN weather VARCHAR(255),
     IN accidentType VARCHAR(255), IN injuredCount INT, IN actionTaken TEXT)
     -- 사고 정보 삽입
-BEGIN
     INSERT INTO AccidentInfo (StationID, AccidentTime, Weather, AccidentType, InjuredCount, ActionTaken)
     VALUES (stationID, accidentTime, weather, accidentType, injuredCount, actionTaken);
 END //
@@ -631,11 +639,10 @@ DELIMITER ;
 
 -- 환불 정보를 기록하는 프로시저
 DELIMITER //
-CREATE FUNCTION RecordRefund(IN paymentID INT) RETURNS BOOLEAN DETERMINISTIC
+CREATE PROCEDURE RecordRefund(IN paymentID INT)
 BEGIN
     -- 환불 정보를 Refund 테이블에 추가
     INSERT INTO Refund (PaymentID) VALUES (paymentID);
-    RETURN TRUE;
 END //
 DELIMITER ;
 
@@ -662,3 +669,4 @@ BEGIN
     RETURN TRUE;
 END //
 DELIMITER ;
+*/
