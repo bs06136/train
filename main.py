@@ -1,6 +1,7 @@
 import mysql.connector
 import itertools
 import heapq
+import os
 from datetime import datetime
 
 
@@ -368,7 +369,7 @@ def print_timetable(StartID, EndID):
     result_time = []
     for i in range(0 , len(timetables)):
         result_time.append(timetables[i][0])
-    print(result_time)
+    #print(result_time)
     return result_time
 
 def find_zero_positions(num, length):
@@ -394,6 +395,14 @@ def search_seat(time_arr):
         seat_info = seat_info | searched_seat_table[0][2]
         train_num = searched_seat_table[0][0]
 
+    query = "SELECT * FROM Timetable WHERE TimeID = %s"
+    db_cursor.execute(query, (time_arr[0],))
+    searched_seat_table = db_cursor.fetchall()
+    for i in range(0, len(time_arr)):
+        print("출발시간 :" + str(searched_seat_table[0][2]) + " 도착시간 : " + str(searched_seat_table[0][3]))
+        break
+    time_num = input("시간을 선택해 주세요 : ")
+
     bi_result = find_zero_positions(seat_info, 40)
     print_result = []
     cal_result = []
@@ -416,7 +425,7 @@ def search_seat(time_arr):
             except ValueError:
                 print("유효하지 않은 입력입니다. 숫자를 입력해주세요.")
             if not seat_info & (2**seat_num) :
-                print(2**seat_num)
+                #print(2**seat_num)
                 cal_result.append(seat_num + 1)
                 seat_type = input("고객 유형을 입력해 주세요 : ")
                 try:
@@ -435,7 +444,7 @@ def payment(user_id):
         query = "SELECT * FROM station WHERE StationID = %s"
         db_cursor.execute(query, (start_station,))
         start_id = db_cursor.fetchall()
-        print(start_id[0])
+        #print(start_id[0])
         if start_id:
             break
     while True:
@@ -451,11 +460,11 @@ def payment(user_id):
     query = "SELECT * FROM Route WHERE StartID = %s AND EndID = %s"
     db_cursor.execute(query, (start_id[0][0],end_id[0][0],))
     route_id = db_cursor.fetchall()
-    print(route_id[0][0])
+    #print(route_id[0][0])
     if not route_id:
         print ("route find error")
     seat_select = search_seat(selected_time_id)
-    print("train " + str(seat_select[0]) + " seat" + str(seat_select[1]) + " tyep " + str(seat_select[2]))
+    #print("train " + str(seat_select[0]) + " seat" + str(seat_select[1]) + " tyep " + str(seat_select[2]))
     for i in range (0 ,len(selected_time_id)):
         for j in range (0 , len(seat_select[1])):
             query = "INSERT INTO Payment (TrainID , CarriageNum, SeatNum, TimeID, PassengerID, " \
@@ -464,6 +473,20 @@ def payment(user_id):
             db_cursor.execute(query, (seat_select[0], 1, seat_select[1][j], selected_time_id[i] , user_id,
                                       route_id[0][0], seat_select[2][j]))
             db_connection.commit()
+    query = "SELECT * FROM Payment"
+    db_cursor.execute(query,)
+    payment = db_cursor.fetchall()
+    for i in range(0, len(payment)):
+        print("payment table")
+        print("결제 id : " + str(payment[i][0]))
+        print("열차 id : " + str(payment[i][1]))
+        print("객차 id : " + str(payment[i][2]))
+        print("좌석 id : " + str(payment[i][3]))
+        print("시간표 id : " + str(payment[i][4]))
+        print("승객 id : " + str(payment[i][5]))
+        print("경로 id : " + str(payment[i][6]))
+        print("요금 id : " + str(payment[i][7]))
+
 
 
 
@@ -502,7 +525,6 @@ def main():
                   "5. user information"
                   "0. Logout")
             choice = input("원하는 옵션의 숫자를 입력하세요: ")
-
             if choice == '1':
                 payment(userid)
             elif choice == '2':

@@ -3,6 +3,10 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/main.py" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/train.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/train2_data_init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/train2_table_init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/train_data.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/train_data_init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/train_table_init.sql" dialect="MySQL" />
   </component>
 </project>

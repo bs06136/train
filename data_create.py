@@ -3,7 +3,24 @@ import itertools
 import heapq
 from datetime import datetime
 
-# MySQL 연결 설정
+# MySQL 서버에 연결
+conn = mysql.connector.connect(
+  host="your_host",       # 데이터베이스 호스트 주소
+  user="your_username",   # 데이터베이스 사용자 이름
+  password="your_password" # 데이터베이스 비밀번호
+)
+
+# 커서 객체 생성
+cursor = conn.cursor()
+
+# 새 데이터베이스 생성
+cursor.execute("CREATE DATABASE train")
+cursor.execute("CREATE DATABASE train2")
+
+# 연결 종료
+cursor.close()
+conn.close()
+
 db_connection = mysql.connector.connect(
     host="localhost",
     user="bs06136",
@@ -22,6 +39,24 @@ try:
     # 커서 생성
     cursor = db_connection.cursor()
 
+    # 모든 프로시저 조회
+    cursor.execute("SHOW PROCEDURE STATUS WHERE Db = 'train'")
+    procedures = cursor.fetchall()
+
+    # 각 프로시저 삭제
+    for procedure in procedures:
+        procedure_name = procedure[1]
+        cursor.execute(f"DROP PROCEDURE IF EXISTS `{procedure_name}`")
+
+    # 모든 함수 조회
+    cursor.execute("SHOW FUNCTION STATUS WHERE Db = 'train'")
+    functions = cursor.fetchall()
+
+    # 각 함수 삭제
+    for function in functions:
+        function_name = function[1]
+        cursor.execute(f"DROP FUNCTION IF EXISTS `{function_name}`")
+
     # 각 SQL 명령어 실행
     for command in sql_commands:
         if command.strip() != '':
@@ -29,6 +64,7 @@ try:
 
     # 변경 사항 저장
     db_connection.commit()
+
 
 except mysql.connector.Error as error:
     print("Failed to execute script: {}".format(error))
@@ -140,3 +176,63 @@ def create_routes_and_connections(db_connection):
 
 create_routes_and_connections(db_connection)
 db_connection.close()
+
+
+# MySQL 연결 설정
+db_connection = mysql.connector.connect(
+    host="localhost",
+    user="bs06136",
+    password="zxc123",
+    database="train2"
+)
+
+try:
+    # SQL 파일 열기
+    with open('train2_table_init.sql', 'r', encoding='utf-8') as file:
+        sql_script = file.read()
+
+    # SQL 명령어를 ';' 기준으로 분리
+    sql_commands = sql_script.split(';')
+
+    # 커서 생성
+    cursor = db_connection.cursor()
+
+    # 각 SQL 명령어 실행
+    for command in sql_commands:
+        if command.strip() != '':
+            cursor.execute(command)
+
+    # 변경 사항 저장
+    db_connection.commit()
+
+except mysql.connector.Error as error:
+    print("Failed to execute script: {}".format(error))
+
+finally:
+    # 연결 닫기
+    print("MySQL table created")
+
+try:
+    # SQL 파일 열기
+    with open('train2_data_init.sql', 'r', encoding='utf-8') as file:
+        sql_script = file.read()
+
+    # SQL 명령어를 ';' 기준으로 분리
+    sql_commands = sql_script.split(';')
+
+    # 커서 생성
+    cursor = db_connection.cursor()
+
+    # 각 SQL 명령어 실행
+    for command in sql_commands:
+        if command.strip() != '':
+            cursor.execute(command)
+
+    # 변경 사항 저장
+    db_connection.commit()
+
+except mysql.connector.Error as error:
+    print("Failed to execute script: {}".format(error))
+
+finally:
+    print("MySQL data inserted")

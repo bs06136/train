@@ -436,7 +436,7 @@ CREATE TABLE IF NOT EXISTS `train`.`maintenance_record` (
   PRIMARY KEY (`Feedback_ID`)
   );
 
-/*
+
 #drop table employees;
 DELIMITER //
 CREATE PROCEDURE InsertStation(IN StationName VARCHAR(255), IN Location VARCHAR(255), IN PlatformCount INT)
@@ -509,8 +509,8 @@ BEGIN
     VALUES (cargoID, routeID, fareID, paymentAmount, paymentDate);
     
     -- 화물 결제 정보를 Payment 테이블에 추가
-    INSERT INTO Payment (CargoID, RouteID, FareID, PaymentAmount, PaymentDate)
-    VALUES (cargoID, routeID, fareID, paymentAmount, paymentDate);
+    INSERT INTO Payment (RouteID, FareID)
+    VALUES (routeID, fareID);
 END //
 DELIMITER ;
 
@@ -549,13 +549,6 @@ BEGIN
         CargoWeight INT
     );
 
-    -- 콤마(,)를 기준으로 문자열을 분리하여 TempCargoData 테이블에 삽입
-    INSERT INTO TempCargoData (CargoType, CargoWeight)
-    SELECT CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(cargoDataList, ',', n.digit+1), ',', -1) AS UNSIGNED) AS CargoType,
-           CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(cargoDataList, ',', n.digit+1), ',', -1) AS UNSIGNED) AS CargoWeight
-    FROM generator_1_to_1000 n
-    WHERE n.digit < LENGTH(cargoDataList) - LENGTH(REPLACE(cargoDataList, ',', '')) + 1;
-
     -- 화물 정보 삽입
     INSERT INTO Cargo (CargoType, CargoWeight)
     SELECT CargoType, CargoWeight FROM TempCargoData;
@@ -583,8 +576,8 @@ BEGIN
     VALUES (cargoID, routeID, fareID, paymentAmount, CURRENT_DATE);
 
     -- 화물 결제 정보를 Payment 테이블에 추가
-    INSERT INTO Payment (CargoID, RouteID, FareID, PaymentAmount, PaymentDate)
-    VALUES (cargoID, routeID, fareID, paymentAmount, CURRENT_DATE);
+    INSERT INTO Payment (RouteID, FareID)
+    VALUES (routeID, fareID);
 
     -- 임시 테이블 삭제
     DROP TEMPORARY TABLE IF EXISTS TempCargoData;
@@ -607,9 +600,11 @@ END //
 DELIMITER ;
 
 --  새로운 사고 정보 삽입 시 처리
-CREATE PROCEDURE HandleAccident(IN stationID INT, IN accidentTime DATETIME, IN weather VARCHAR(255), 
+DELIMITER //
+CREATE PROCEDURE HandleAccident(IN stationID INT, IN accidentTime DATETIME, IN weather VARCHAR(255),
     IN accidentType VARCHAR(255), IN injuredCount INT, IN actionTaken TEXT)
     -- 사고 정보 삽입
+BEGIN
     INSERT INTO AccidentInfo (StationID, AccidentTime, Weather, AccidentType, InjuredCount, ActionTaken)
     VALUES (stationID, accidentTime, weather, accidentType, injuredCount, actionTaken);
 END //
@@ -669,4 +664,3 @@ BEGIN
     RETURN TRUE;
 END //
 DELIMITER ;
-*/
